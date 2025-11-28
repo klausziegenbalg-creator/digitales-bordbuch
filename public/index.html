@@ -265,6 +265,13 @@
         }
 
         ladeStaedte();
+db.collection('automaten').get().then(snap => {
+  console.log("TEST automaten count:", snap.size);
+  snap.forEach(doc => console.log("TEST doc:", doc.id, doc.data()));
+}).catch(err => {
+  console.error("TEST error:", err);
+});
+
     </script>
 </body>
 </html>
