@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
 
-  <!-- Firebase (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
@@ -20,9 +19,7 @@
       --text-main: #212121;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -30,7 +27,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 18px;
+      font-size: 20px;
     }
 
     .page {
@@ -39,7 +36,7 @@
     }
 
     h1 {
-      font-size: 26px;
+      font-size: 30px;
       margin: 4px 4px 12px;
       color: var(--accent-strong);
     }
@@ -47,7 +44,7 @@
     .section {
       background: var(--card-bg);
       border-radius: 14px;
-      padding: 14px 14px 16px;
+      padding: 16px 16px 18px;
       margin: 10px 4px;
       box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
       border: 1px solid var(--accent-soft);
@@ -57,18 +54,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 13px;
-      padding: 2px 8px;
+      font-size: 14px;
+      padding: 3px 10px;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent-strong);
@@ -77,12 +74,12 @@
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       margin-top: 4px;
     }
 
     label {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
@@ -90,10 +87,11 @@
 
     select, input[type="date"], input[type="number"], textarea {
       width: 100%;
-      padding: 10px 12px;
+      padding: 12px 14px;
+      margin: 2px 0 0;
       border-radius: 8px;
       border: 1px solid #cfd8dc;
-      font-size: 16px;
+      font-size: 18px;
       background: #fafafa;
     }
 
@@ -104,10 +102,9 @@
 
     textarea {
       resize: vertical;
-      min-height: 70px;
+      min-height: 80px;
     }
 
-    /* Einspaltige Checkliste */
     .task-list {
       display: flex;
       flex-direction: column;
@@ -119,7 +116,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 6px 8px;
+      padding: 8px 10px;
       border-radius: 10px;
       background: #fafafa;
       border: 1px solid #eceff1;
@@ -130,8 +127,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -139,27 +136,19 @@
 
     .task-label {
       flex: 1;
-      font-size: 16px;
+      font-size: 18px;
     }
 
-    /* Zweispaltige Bestände auf großen Screens, sonst einspaltig */
     .stock-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 6px;
     }
 
     .stock-field {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-    }
-
-    @media (min-width: 640px) {
-      .stock-grid {
-        grid-template-columns: 1fr 1fr;
-      }
     }
 
     button {
@@ -169,22 +158,18 @@
       gap: 8px;
       background: var(--accent);
       color: white;
-      padding: 12px 24px;
+      padding: 12px 26px;
       border: none;
       border-radius: 999px;
-      font-size: 18px;
+      font-size: 20px;
       cursor: pointer;
-      margin: 14px 4px 0;
+      margin: 16px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon {
-      font-size: 20px;
-    }
+    button span.icon { font-size: 22px; }
 
-    button:hover:not(:disabled) {
-      background: #1565c0;
-    }
+    button:hover:not(:disabled) { background: #1565c0; }
 
     button:disabled {
       background: #b0bec5;
@@ -193,16 +178,21 @@
     }
 
     #status {
-      margin: 10px 4px 0;
-      font-size: 15px;
+      margin: 12px 4px 0;
+      font-size: 16px;
     }
 
-    #status.ok {
-      color: var(--accent-strong);
-    }
+    #status.ok { color: var(--accent-strong); }
+    #status.err { color: var(--danger); }
 
-    #status.err {
-      color: var(--danger);
+    @media (min-width: 700px) {
+      .stock-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .stock-field {
+        width: 48%;
+      }
     }
   </style>
 </head>
@@ -286,11 +276,11 @@
           <label for="zucker_weiss">Weißer Zucker</label>
           <input type="number" id="zucker_weiss" step="0.5" min="0" max="10">
         </div>
-        <div class="stock-field">
+        <div class="stock-field" id="feld_weinrot">
           <label for="zucker_weinrot">Weinrot</label>
           <input type="number" id="zucker_weinrot" step="0.5" min="0" max="10">
         </div>
-        <div class="stock-field">
+        <div class="stock-field" id="feld_gruen">
           <label for="zucker_gruen">Grün</label>
           <input type="number" id="zucker_gruen" step="0.5" min="0" max="10">
         </div>
@@ -343,6 +333,9 @@
     const speichernBtn = document.getElementById('speichernBtn');
     const statusDiv = document.getElementById('status');
 
+    const feldWeinrot = document.getElementById('feld_weinrot');
+    const feldGruen = document.getElementById('feld_gruen');
+
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
@@ -353,6 +346,17 @@
       option.textContent = text;
       option.value = value;
       select.appendChild(option);
+    }
+
+    function updateFarbfelderSichtbarkeit() {
+      const center = centerSelect.value || "";
+      const sichtbar = center === "Phönix";
+      feldWeinrot.style.display = sichtbar ? "flex" : "none";
+      feldGruen.style.display = sichtbar ? "flex" : "none";
+      if (!sichtbar) {
+        document.getElementById('zucker_weinrot').value = "";
+        document.getElementById('zucker_gruen').value = "";
+      }
     }
 
     async function ladeStaedte() {
@@ -376,6 +380,8 @@
       automatSelect.disabled = true;
       mitarbeiterSelect.disabled = true;
       speichernBtn.disabled = true;
+
+      updateFarbfelderSichtbarkeit();
     }
 
     async function ladeCenter(stadt) {
@@ -387,7 +393,10 @@
       mitarbeiterSelect.disabled = true;
       speichernBtn.disabled = true;
 
-      if (!stadt) return;
+      if (!stadt) {
+        updateFarbfelderSichtbarkeit();
+        return;
+      }
 
       const snapshot = await db.collection('automaten')
         .where('stadt', '==', stadt)
@@ -399,6 +408,8 @@
       });
 
       if (centerSelect.options.length > 1) centerSelect.disabled = false;
+
+      updateFarbfelderSichtbarkeit();
     }
 
     async function ladeAutomatenUndMitarbeiter(stadt, center) {
@@ -411,7 +422,10 @@
       mitarbeiterSelect.disabled = true;
       speichernBtn.disabled = true;
 
-      if (!stadt || !center) return;
+      if (!stadt || !center) {
+        updateFarbfelderSichtbarkeit();
+        return;
+      }
 
       const snapshot = await db.collection('automaten')
         .where('stadt', '==', stadt)
@@ -433,6 +447,8 @@
 
       if (automatSelect.options.length > 1) automatSelect.disabled = false;
       if (mitarbeiterSelect.options.length > 1) mitarbeiterSelect.disabled = false;
+
+      updateFarbfelderSichtbarkeit();
     }
 
     function pruefeFormular() {
@@ -523,5 +539,6 @@
   </script>
 </body>
 </html>
+
 
 
