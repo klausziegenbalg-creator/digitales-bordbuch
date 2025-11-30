@@ -35,22 +35,22 @@
     .section h3 {
       margin-top: 0;
       margin-bottom: 8px;
-      font-size: 16px;
+      font-size: 17px;
       color: #0d47a1;
     }
 
     select, input, textarea {
-      padding: 6px 8px;
+      padding: 8px 10px;
       margin: 4px 0;
       border: 1px solid #ccc;
       border-radius: 4px;
       width: 100%;
       box-sizing: border-box;
-      font-size: 14px;
+      font-size: 15px;
     }
 
-    label {
-      font-size: 14px;
+    label, td {
+      font-size: 15px;
     }
 
     table.task-table {
@@ -59,14 +59,20 @@
     }
 
     table.task-table td {
-      padding: 3px 4px;
+      padding: 4px 6px;
       vertical-align: middle;
-      font-size: 14px;
     }
 
-    table.task-table td:first-child {
+    /* 2 Spalten für Aufgaben */
+    table.task-table.two-cols td {
+      width: 50%;
+    }
+
+    /* Checkbox-Zelle schmal halten */
+    .chk-cell {
       width: 26px;
       text-align: center;
+      white-space: nowrap;
     }
 
     button {
@@ -112,58 +118,32 @@
 
   <div class="section">
     <h3>2. Aufgaben pro Automat</h3>
-    <table class="task-table">
+    <table class="task-table two-cols">
       <tr>
-        <td><input type="checkbox" id="zucker"></td>
-        <td>Zucker auffüllen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="wasser"></td>
-        <td>Wasser auffüllen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="staebe"></td>
-        <td>Stäbe auffüllen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="zuckerfach"></td>
-        <td>Zuckerfach reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="faecher"></td>
-        <td>Alle Fächer reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="abwasser"></td>
-        <td>Abwasser entleeren</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="produktionsraum"></td>
-        <td>Produktionsraum reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="messer"></td>
-        <td>Messer + Rädchen reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="roboterarm"></td>
-        <td>Roboterarm gründlich reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="auffangschale"></td>
-        <td>Auffangschale reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="aufbewahrung"></td>
-        <td>Aufbewahrungsfach aufräumen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="aussen"></td>
-        <td>Automat außen reinigen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="scheiben"></td>
-        <td>Scheiben reinigen</td>
+        <td>
+          <table class="task-table">
+            <tr><td class="chk-cell"><input type="checkbox" id="zucker"></td><td>Zucker auffüllen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="staebe"></td><td>Stäbe auffüllen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="faecher"></td><td>Alle Fächer reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="produktionsraum"></td><td>Produktionsraum reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="roboterarm"></td><td>Roboterarm gründlich reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="auffangschale"></td><td>Auffangschale reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="aussen"></td><td>Automat außen reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="brennerkopf"></td><td>Brennerkopf reinigen</td></tr>
+          </table>
+        </td>
+        <td>
+          <table class="task-table">
+            <tr><td class="chk-cell"><input type="checkbox" id="wasser"></td><td>Wasser auffüllen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="zuckerfach"></td><td>Zuckerfach reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="abwasser"></td><td>Abwasser entleeren</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="messer"></td><td>Messer + Rädchen reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="sieb"></td><td>Sieb oben reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="aufbewahrung"></td><td>Aufbewahrungsfach aufräumen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="scheiben"></td><td>Scheiben reinigen</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="duese"></td><td>Düse hinter Brennerkopf reinigen</td></tr>
+          </table>
+        </td>
       </tr>
     </table>
   </div>
@@ -194,22 +174,20 @@
 
   <div class="section">
     <h3>4. Funktionsprüfung</h3>
-    <table class="task-table">
+    <table class="task-table two-cols">
       <tr>
-        <td><input type="checkbox" id="befuchtung"></td>
-        <td>Befeuchtungstest</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="reinigungstest"></td>
-        <td>Reinigungstest</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="stabgenommen"></td>
-        <td>Automat. neuen Stab genommen</td>
-      </tr>
-      <tr>
-        <td><input type="checkbox" id="roboterwinkel"></td>
-        <td>Roboterarm 90° Winkel</td>
+        <td>
+          <table class="task-table">
+            <tr><td class="chk-cell"><input type="checkbox" id="befuchtung"></td><td>Befeuchtungstest</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="stabgenommen"></td><td>Automat. neuen Stab genommen</td></tr>
+          </table>
+        </td>
+        <td>
+          <table class="task-table">
+            <tr><td class="chk-cell"><input type="checkbox" id="reinigungstest"></td><td>Reinigungstest</td></tr>
+            <tr><td class="chk-cell"><input type="checkbox" id="roboterwinkel"></td><td>Roboterarm 90° Winkel</td></tr>
+          </table>
+        </td>
       </tr>
     </table>
     <label>Auffälligkeiten:
@@ -402,6 +380,8 @@
           aufbewahrung_aufräumen: document.getElementById('aufbewahrung').checked,
           automat_aeusserlich_reinigen: document.getElementById('aussen').checked,
           scheiben_reinigen: document.getElementById('scheiben').checked,
+          brennerkopf_reinigen: document.getElementById('brennerkopf').checked,
+          duese_reinigen: document.getElementById('duese').checked,
           zucker_rot: parseFloat(document.getElementById('zucker_rot').value) || 0,
           zucker_gelb: parseFloat(document.getElementById('zucker_gelb').value) || 0,
           zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
@@ -437,8 +417,3 @@
   </script>
 </body>
 </html>
-
-
-      <label>Blauer Zucker: <input type="number" id="zucker_blau" step="0.5" min="0" max="10" /></label>
-      <label>Weißer Zucker: <input type="number" id="zucker_weiss" step="0.5" min="0" max="10" /></label>
-      <label
