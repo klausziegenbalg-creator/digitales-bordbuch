@@ -145,35 +145,35 @@
 
     // 2. Center laden
     async function ladeCenter(stadt) {
-      clearSelect(centerSelect);
-      addOption(centerSelect, 'Wähle Center...', '');
+  clearSelect(centerSelect);
+  addOption(centerSelect, 'Wähle Center...', '');
 
-      centerSelect.disabled = true;
-      automatSelect.disabled = true;
-      mitarbeiterSelect.disabled = true;
-      speichernBtn.disabled = true;
+  centerSelect.disabled = true;
+  automatSelect.disabled = true;
+  mitarbeiterSelect.disabled = true;
+  speichernBtn.disabled = true;
 
-      if (!stadt) return;
+  if (!stadt) return;
 
-      const snapshot = await db.collection('automaten')
-        .where('stadt', '==', stadt)
-        .get();
+  const snapshot = await db.collection('automaten')
+    .where('stadt', '==', stadt)
+    .get();
 
-      const centerSet = new Set();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.center) {
-          centerSet.add(String(data.center).trim());
-        }
-      });
+  console.log("CENTER TEST für Stadt:", stadt, "Dokumente:", snapshot.size);
 
-      const centers = Array.from(centerSet).sort();
-      centers.forEach(center => addOption(centerSelect, center, center));
-
-      if (centers.length > 0) {
-        centerSelect.disabled = false;
-      }
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    console.log("CENTER-DOC:", doc.id, data.center);
+    if (data.center) {
+      addOption(centerSelect, String(data.center), String(data.center));
     }
+  });
+
+  if (centerSelect.options.length > 1) {
+    centerSelect.disabled = false;
+  }
+}
+
 
     // 3. Automaten & Mitarbeiter laden
     async function ladeAutomatenUndMitarbeiter(stadt, center) {
