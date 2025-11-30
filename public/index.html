@@ -23,11 +23,11 @@
 
     body {
       margin: 0;
-      padding: 18px 10px 44px;
+      padding: 20px 10px 46px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 30px;
+      font-size: 34px;          /* noch größer für Handy */
     }
 
     .page {
@@ -36,16 +36,16 @@
     }
 
     h1 {
-      font-size: 40px;
-      margin: 4px 4px 14px;
+      font-size: 44px;
+      margin: 4px 4px 16px;
       color: var(--accent-strong);
     }
 
     .section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 18px 18px 20px;
-      margin: 12px 4px;
+      border-radius: 18px;
+      padding: 20px 20px 22px;
+      margin: 14px 4px;
       box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
       border: 1px solid var(--accent-soft);
     }
@@ -54,18 +54,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .section-title {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 20px;
-      padding: 4px 12px;
+      font-size: 22px;
+      padding: 5px 14px;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent-strong);
@@ -74,12 +74,12 @@
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-top: 4px;
     }
 
     label {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
@@ -87,11 +87,11 @@
 
     select, input[type="date"], input[type="number"], textarea {
       width: 100%;
-      padding: 18px 20px;
+      padding: 20px 22px;
       margin: 2px 0 0;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #cfd8dc;
-      font-size: 26px;
+      font-size: 30px;
       background: #fafafa;
     }
 
@@ -102,22 +102,22 @@
 
     textarea {
       resize: vertical;
-      min-height: 90px;
+      min-height: 100px;
     }
 
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
+      gap: 12px;
+      margin-top: 8px;
     }
 
     .task-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 12px;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
       background: #fafafa;
       border: 1px solid #eceff1;
     }
@@ -127,8 +127,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -136,14 +136,14 @@
 
     .task-label {
       flex: 1;
-      font-size: 26px;
+      font-size: 30px;
     }
 
     .stock-grid {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 14px;
+      margin-top: 10px;
     }
 
     .stock-field {
@@ -155,19 +155,19 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       background: var(--accent);
       color: white;
-      padding: 18px 34px;
+      padding: 20px 38px;
       border: none;
       border-radius: 999px;
-      font-size: 28px;
+      font-size: 32px;
       cursor: pointer;
-      margin: 18px 4px 0;
+      margin: 20px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 30px; }
+    button span.icon { font-size: 34px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -178,8 +178,8 @@
     }
 
     #status {
-      margin: 14px 4px 0;
-      font-size: 22px;
+      margin: 16px 4px 0;
+      font-size: 24px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -235,22 +235,22 @@
         <div class="section-badge">Ankreuzen</div>
       </div>
       <div class="task-list">
-        <div class="task-row"><input type="checkbox" id="zucker"><div class="task-label">Zucker auffüllen</div></div>
-        <div class="task-row"><input type="checkbox" id="wasser"><div class="task-label">Wasser auffüllen</div></div>
-        <div class="task-row"><input type="checkbox" id="staebe"><div class="task-label">Stäbe auffüllen</div></div>
-        <div class="task-row"><input type="checkbox" id="zuckerfach"><div class="task-label">Zuckerfach reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="faecher"><div class="task-label">Alle Fächer reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="abwasser"><div class="task-label">Abwasser entleeren</div></div>
-        <div class="task-row"><input type="checkbox" id="produktionsraum"><div class="task-label">Produktionsraum reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="messer"><div class="task-label">Messer + Rädchen reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="roboterarm"><div class="task-label">Roboterarm gründlich reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="sieb"><div class="task-label">Sieb oben reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="auffangschale"><div class="task-label">Auffangschale reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="aufbewahrung"><div class="task-label">Aufbewahrungsfach aufräumen</div></div>
-        <div class="task-row"><input type="checkbox" id="aussen"><div class="task-label">Automat außen reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="scheiben"><div class="task-label">Scheiben reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="brennerkopf"><div class="task-label">Brennerkopf reinigen</div></div>
-        <div class="task-row"><input type="checkbox" id="duese"><div class="task-label">Düse hinter Brennerkopf reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="zucker"><div class="task-label">Zucker aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="wasser"><div class="task-label">Wasser aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="staebe"><div class="task-label">Stäbe aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="zuckerfach"><div class="task-label">Zuckerfach gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="faecher"><div class="task-label">Alle Fächer gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="abwasser"><div class="task-label">Abwasser entleert</div></div>
+        <div class="task-row"><input type="checkbox" id="produktionsraum"><div class="task-label">Produktionsraum gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="messer"><div class="task-label">Messer + Rädchen gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="roboterarm"><div class="task-label">Roboterarm gründlich gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="sieb"><div class="task-label">Sieb oben gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="auffangschale"><div class="task-label">Auffangschale gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="aufbewahrung"><div class="task-label">Aufbewahrungsfach aufgeräumt</div></div>
+        <div class="task-row"><input type="checkbox" id="aussen"><div class="task-label">Automat außen gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="scheiben"><div class="task-label">Scheiben gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="brennerkopf"><div class="task-label">Brennerkopf gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="duese"><div class="task-label">Düse hinter Brennerkopf gereinigt</div></div>
       </div>
     </div>
 
@@ -491,19 +491,19 @@
           zucker_aufgefuellt: document.getElementById('zucker').checked,
           wasser_aufgefuellt: document.getElementById('wasser').checked,
           staebe_aufgefuellt: document.getElementById('staebe').checked,
-          zuckerfach_reinigen: document.getElementById('zuckerfach').checked,
-          faecher_reinigen: document.getElementById('faecher').checked,
-          abwasser_entleeren: document.getElementById('abwasser').checked,
-          produktionsraum_reinigen: document.getElementById('produktionsraum').checked,
-          messer_reinigen: document.getElementById('messer').checked,
-          roboterarm_reinigen: document.getElementById('roboterarm').checked,
-          sieb_reinigen: document.getElementById('sieb').checked,
-          auffangschale_reinigen: document.getElementById('auffangschale').checked,
-          aufbewahrung_aufräumen: document.getElementById('aufbewahrung').checked,
-          automat_aeusserlich_reinigen: document.getElementById('aussen').checked,
-          scheiben_reinigen: document.getElementById('scheiben').checked,
-          brennerkopf_reinigen: document.getElementById('brennerkopf').checked,
-          duese_reinigen: document.getElementById('duese').checked,
+          zuckerfach_gereinigt: document.getElementById('zuckerfach').checked,
+          faecher_gereinigt: document.getElementById('faecher').checked,
+          abwasser_entleert: document.getElementById('abwasser').checked,
+          produktionsraum_gereinigt: document.getElementById('produktionsraum').checked,
+          messer_gereinigt: document.getElementById('messer').checked,
+          roboterarm_gereinigt: document.getElementById('roboterarm').checked,
+          sieb_gereinigt: document.getElementById('sieb').checked,
+          auffangschale_gereinigt: document.getElementById('auffangschale').checked,
+          aufbewahrung_aufgeraeumt: document.getElementById('aufbewahrung').checked,
+          automat_aussen_gereinigt: document.getElementById('aussen').checked,
+          scheiben_gereinigt: document.getElementById('scheiben').checked,
+          brennerkopf_gereinigt: document.getElementById('brennerkopf').checked,
+          duese_gereinigt: document.getElementById('duese').checked,
           zucker_rot: parseFloat(document.getElementById('zucker_rot').value) || 0,
           zucker_gelb: parseFloat(document.getElementById('zucker_gelb').value) || 0,
           zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
@@ -539,8 +539,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
