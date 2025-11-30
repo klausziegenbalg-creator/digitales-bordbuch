@@ -188,9 +188,13 @@
 
     snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.automatCode) {
-            addOption(automatSelect, String(data.automatCode).trim(), String(data.automatCode).trim());
+        console.log("AUTO-DOC:", doc.id, data);
+
+        const code = (data.automatCode || data.Automat || "").toString().trim();
+        if (code) {
+            addOption(automatSelect, code, code);
         }
+
         if (data.mitarbeiter) {
             mitarbeiterSet.add(String(data.mitarbeiter).trim());
         }
@@ -203,6 +207,7 @@
     mitarbeiterSelect.disabled = mitarbeiterSelect.options.length <= 1;
     speichernBtn.disabled = true;
 }
+
 
 
         function pruefeFormular() {
