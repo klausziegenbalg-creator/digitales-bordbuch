@@ -41,8 +41,8 @@
     }
 
     select, input, textarea {
-      padding: 8px 10px;
-      margin: 4px 0;
+      padding: 10px 12px;
+      margin: 6px 0;
       border: 1px solid #ccc;
       border-radius: 6px;
       width: 100%;
@@ -50,37 +50,32 @@
       font-size: 18px;
     }
 
-    label, td {
+    label {
       font-size: 18px;
     }
 
-    table.task-table {
-      width: 100%;
-      border-collapse: collapse;
+    /* Einspaltige Aufgaben-Liste */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 4px 0;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .task-row input[type="checkbox"] {
+      transform: scale(1.4);
       margin: 0;
+      flex-shrink: 0;
     }
 
-    table.task-table td {
-      padding: 2px 2px;
-      vertical-align: middle;
-    }
-
-    table.task-table.two-cols td {
-      width: 50%;
-      vertical-align: top;
-    }
-
-    /* Nur Checkbox + Text, kein extra Rand */
-    .chk-cell {
-      width: 30px;
-      text-align: left;
-      padding-right: 4px;
-      white-space: nowrap;
-    }
-
-    .chk-cell input[type="checkbox"] {
-      transform: scale(1.3);
-      margin: 0;
+    .task-label {
+      flex: 1;
     }
 
     button {
@@ -126,78 +121,116 @@
 
   <div class="section">
     <h3>2. Aufgaben pro Automat</h3>
-    <table class="task-table two-cols">
-      <tr>
-        <td>
-          <table class="task-table">
-            <tr><td class="chk-cell"><input type="checkbox" id="zucker"></td><td>Zucker auffüllen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="staebe"></td><td>Stäbe auffüllen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="faecher"></td><td>Alle Fächer reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="produktionsraum"></td><td>Produktionsraum reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="roboterarm"></td><td>Roboterarm gründlich reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="auffangschale"></td><td>Auffangschale reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="aussen"></td><td>Automat außen reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="brennerkopf"></td><td>Brennerkopf reinigen</td></tr>
-          </table>
-        </td>
-        <td>
-          <table class="task-table">
-            <tr><td class="chk-cell"><input type="checkbox" id="wasser"></td><td>Wasser auffüllen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="zuckerfach"></td><td>Zuckerfach reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="abwasser"></td><td>Abwasser entleeren</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="messer"></td><td>Messer + Rädchen reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="sieb"></td><td>Sieb oben reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="aufbewahrung"></td><td>Aufbewahrungsfach aufräumen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="scheiben"></td><td>Scheiben reinigen</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="duese"></td><td>Düse hinter Brennerkopf reinigen</td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    <div class="task-list">
+      <div class="task-row">
+        <input type="checkbox" id="zucker" />
+        <div class="task-label">Zucker auffüllen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="wasser" />
+        <div class="task-label">Wasser auffüllen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="staebe" />
+        <div class="task-label">Stäbe auffüllen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="zuckerfach" />
+        <div class="task-label">Zuckerfach reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="faecher" />
+        <div class="task-label">Alle Fächer reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="abwasser" />
+        <div class="task-label">Abwasser entleeren</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="produktionsraum" />
+        <div class="task-label">Produktionsraum reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="messer" />
+        <div class="task-label">Messer + Rädchen reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="roboterarm" />
+        <div class="task-label">Roboterarm gründlich reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="sieb" />
+        <div class="task-label">Sieb oben reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="auffangschale" />
+        <div class="task-label">Auffangschale reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="aufbewahrung" />
+        <div class="task-label">Aufbewahrungsfach aufräumen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="aussen" />
+        <div class="task-label">Automat außen reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="scheiben" />
+        <div class="task-label">Scheiben reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="brennerkopf" />
+        <div class="task-label">Brennerkopf reinigen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="duese" />
+        <div class="task-label">Düse hinter Brennerkopf reinigen</div>
+      </div>
+    </div>
   </div>
 
   <div class="section">
     <h3>3. Bestände (angefangen ≥ 50% = 0,5)</h3>
-    <table class="task-table">
-      <tr>
-        <td>Roter Zucker:</td>
-        <td><input type="number" id="zucker_rot" step="0.5" min="0" max="10" /></td>
-        <td>Gelber Zucker:</td>
-        <td><input type="number" id="zucker_gelb" step="0.5" min="0" max="10" /></td>
-      </tr>
-      <tr>
-        <td>Blauer Zucker:</td>
-        <td><input type="number" id="zucker_blau" step="0.5" min="0" max="10" /></td>
-        <td>Weißer Zucker:</td>
-        <td><input type="number" id="zucker_weiss" step="0.5" min="0" max="10" /></td>
-      </tr>
-      <tr>
-        <td>Weinrot:</td>
-        <td><input type="number" id="zucker_weinrot" step="0.5" min="0" max="10" /></td>
-        <td>Grün:</td>
-        <td><input type="number" id="zucker_gruen" step="0.5" min="0" max="10" /></td>
-      </tr>
-    </table>
+    <label>Roter Zucker:
+      <input type="number" id="zucker_rot" step="0.5" min="0" max="10" />
+    </label>
+    <label>Gelber Zucker:
+      <input type="number" id="zucker_gelb" step="0.5" min="0" max="10" />
+    </label>
+    <label>Blauer Zucker:
+      <input type="number" id="zucker_blau" step="0.5" min="0" max="10" />
+    </label>
+    <label>Weißer Zucker:
+      <input type="number" id="zucker_weiss" step="0.5" min="0" max="10" />
+    </label>
+    <label>Weinrot:
+      <input type="number" id="zucker_weinrot" step="0.5" min="0" max="10" />
+    </label>
+    <label>Grün:
+      <input type="number" id="zucker_gruen" step="0.5" min="0" max="10" />
+    </label>
   </div>
 
   <div class="section">
     <h3>4. Funktionsprüfung</h3>
-    <table class="task-table two-cols">
-      <tr>
-        <td>
-          <table class="task-table">
-            <tr><td class="chk-cell"><input type="checkbox" id="befuchtung"></td><td>Befeuchtungstest</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="stabgenommen"></td><td>Automat. neuen Stab genommen</td></tr>
-          </table>
-        </td>
-        <td>
-          <table class="task-table">
-            <tr><td class="chk-cell"><input type="checkbox" id="reinigungstest"></td><td>Reinigungstest</td></tr>
-            <tr><td class="chk-cell"><input type="checkbox" id="roboterwinkel"></td><td>Roboterarm 90° Winkel</td></tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    <div class="task-list">
+      <div class="task-row">
+        <input type="checkbox" id="befuchtung" />
+        <div class="task-label">Befeuchtungstest</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="reinigungstest" />
+        <div class="task-label">Reinigungstest</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="stabgenommen" />
+        <div class="task-label">Automat. neuen Stab genommen</div>
+      </div>
+      <div class="task-row">
+        <input type="checkbox" id="roboterwinkel" />
+        <div class="task-label">Roboterarm 90° Winkel</div>
+      </div>
+    </div>
     <label>Auffälligkeiten:
       <textarea id="auffaelligkeiten" rows="3" placeholder="Alles ok oder Probleme notieren..."></textarea>
     </label>
@@ -231,9 +264,7 @@
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
-    function clearSelect(select) {
-      select.innerHTML = '';
-    }
+    function clearSelect(select) { select.innerHTML = ''; }
 
     function addOption(select, text, value) {
       const option = document.createElement('option');
@@ -251,9 +282,7 @@
       const staedteSet = new Set();
       snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.stadt) {
-          staedteSet.add(String(data.stadt).trim());
-        }
+        if (data.stadt) staedteSet.add(String(data.stadt).trim());
       });
 
       Array.from(staedteSet).sort().forEach(stadt => addOption(stadtSelect, stadt, stadt));
@@ -282,14 +311,10 @@
 
       snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.center) {
-          addOption(centerSelect, String(data.center), String(data.center));
-        }
+        if (data.center) addOption(centerSelect, String(data.center), String(data.center));
       });
 
-      if (centerSelect.options.length > 1) {
-        centerSelect.disabled = false;
-      }
+      if (centerSelect.options.length > 1) centerSelect.disabled = false;
     }
 
     async function ladeAutomatenUndMitarbeiter(stadt, center) {
@@ -330,7 +355,6 @@
       const automat = automatSelect.value;
       const mitarbeiter = mitarbeiterSelect.value;
       const datum = datumInput.value;
-
       speichernBtn.disabled = !(stadt && center && automat && mitarbeiter && datum);
     }
 
@@ -413,3 +437,4 @@
   </script>
 </body>
 </html>
+
