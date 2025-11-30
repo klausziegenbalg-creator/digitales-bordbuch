@@ -204,11 +204,24 @@
 
 
     const mitarbeiterListe = Array.from(mitarbeiterSet).sort();
-    mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
+mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
 
-    automatSelect.disabled = automatSelect.options.length <= 1;
-    mitarbeiterSelect.disabled = mitarbeiterSelect.options.length <= 1;
-    speichernBtn.disabled = true;
+// Wenn mindestens ein Automat da ist, Auswahl erlauben
+if (automatSelect.options.length > 1) {
+    automatSelect.disabled = false;
+} else {
+    automatSelect.disabled = true;
+}
+
+// Wenn mindestens ein Mitarbeiter da ist, Auswahl erlauben
+if (mitarbeiterSelect.options.length > 1) {
+    mitarbeiterSelect.disabled = false;
+} else {
+    mitarbeiterSelect.disabled = true;
+}
+
+speichernBtn.disabled = true;
+
 }
 
 
