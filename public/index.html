@@ -167,36 +167,43 @@
 
 
         async function ladeAutomatenUndMitarbeiter(stadt, center) {
-            clearSelect(automatSelect);
-            addOption(automatSelect, 'Wähle Automat...', '');
-            clearSelect(mitarbeiterSelect);
-            addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
+    clearSelect(automatSelect);
+    addOption(automatSelect, 'Wähle Automat...', '');
+    clearSelect(mitarbeiterSelect);
+    addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
 
-            if (!stadt || !center) {
-                automatSelect.disabled = true;
-                mitarbeiterSelect.disabled = true;
-                speichernBtn.disabled = true;
-                return;
-            }
+    if (!stadt || !center) {
+        automatSelect.disabled = true;
+        mitarbeiterSelect.disabled = true;
+        speichernBtn.disabled = true;
+        return;
+    }
 
-            const snapshot = await db.collection('automaten')
-                .where('stadt', '==', stadt)
-                .where('center', '==', center)
-                .get();
+    const snapshot = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .where('center', '==', center)
+        .get();
 
-            const mitarbeiterSet = new Set();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                addOption(automatSelect, data.automatCode, data.automatCode);
-                mitarbeiterSet.add(data.mitarbeiter.trim());
-            });
+    const mitarbeiterSet = new Set();
 
-            const mitarbeiterListe = Array.from(mitarbeiterSet).sort();
-            mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
-            automatSelect.disabled = false;
-            mitarbeiterSelect.disabled = false;
-            speichernBtn.disabled = true;
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.automatCode) {
+            addOption(automatSelect, String(data.automatCode).trim(), String(data.automatCode).trim());
         }
+        if (data.mitarbeiter) {
+            mitarbeiterSet.add(String(data.mitarbeiter).trim());
+        }
+    });
+
+    const mitarbeiterListe = Array.from(mitarbeiterSet).sort();
+    mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
+
+    automatSelect.disabled = automatSelect.options.length <= 1;
+    mitarbeiterSelect.disabled = mitarbeiterSelect.options.length <= 1;
+    speichernBtn.disabled = true;
+}
+
 
         function pruefeFormular() {
             const stadt = stadtSelect.value;
