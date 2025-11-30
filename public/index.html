@@ -111,22 +111,27 @@
         }
 
         async function ladeStaedte() {
-            clearSelect(stadtSelect);
-            addOption(stadtSelect, 'Wähle Stadt...', '');
+    clearSelect(stadtSelect);
+    addOption(stadtSelect, 'Wähle Stadt...', '');
 
-            const snapshot = await db.collection('automaten').get();
-            const staedteSet = new Set();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                staedteSet.add(data.stadt.trim());
-            });
-            const staedte = Array.from(staedteSet).sort();
-            staedte.forEach(stadt => addOption(stadtSelect, stadt, stadt));
-            centerSelect.disabled = true;
-            automatSelect.disabled = true;
-            mitarbeiterSelect.disabled = true;
-            speichernBtn.disabled = true;
+    const snapshot = await db.collection('automaten').get();
+    console.log("TEST automaten count:", snapshot.size);
+    const staedteSet = new Set();
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        console.log("Doc:", doc.id, data);
+        if (data.stadt) {
+            staedteSet.add(String(data.stadt).trim());
         }
+    });
+    const staedte = Array.from(staedteSet).sort();
+    staedte.forEach(stadt => addOption(stadtSelect, stadt, stadt));
+    centerSelect.disabled = true;
+    automatSelect.disabled = true;
+    mitarbeiterSelect.disabled = true;
+    speichernBtn.disabled = true;
+}
+
 
         async function ladeCenter(stadt) {
             clearSelect(centerSelect);
