@@ -187,18 +187,21 @@
     const mitarbeiterSet = new Set();
 
     snapshot.forEach(doc => {
-        const data = doc.data();
-        console.log("AUTO-DOC:", doc.id, data);
+    const data = doc.data();
+    console.log("AUTO-DOC:", doc.id, data);
 
-        const code = (data.automatCode || data.Automat || "").toString().trim();
-        if (code) {
-            addOption(automatSelect, code, code);
-        }
+    const code = (data.automatCode || data.Automat || "").toString().trim();
+    console.log("AUTO-CODE:", code, "options BEFORE:", automatSelect.options.length);
+    if (code) {
+        addOption(automatSelect, code, code);
+        console.log("OPTION ADDED, options AFTER:", automatSelect.options.length);
+    }
 
-        if (data.mitarbeiter) {
-            mitarbeiterSet.add(String(data.mitarbeiter).trim());
-        }
-    });
+    if (data.mitarbeiter) {
+        mitarbeiterSet.add(String(data.mitarbeiter).trim());
+    }
+});
+
 
     const mitarbeiterListe = Array.from(mitarbeiterSet).sort();
     mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
