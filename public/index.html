@@ -134,28 +134,37 @@
 
 
         async function ladeCenter(stadt) {
-            clearSelect(centerSelect);
-            addOption(centerSelect, 'Wähle Center...', '');
-            if (!stadt) {
-                centerSelect.disabled = true;
-                automatSelect.disabled = true;
-                mitarbeiterSelect.disabled = true;
-                speichernBtn.disabled = true;
-                return;
-            }
-            const snapshot = await db.collection('automaten').where('stadt', '==', stadt).get();
-            const centerSet = new Set();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                centerSet.add(data.center.trim());
-            });
-            const centers = Array.from(centerSet).sort();
-            centers.forEach(center => addOption(centerSelect, center, center));
-            centerSelect.disabled = false;
-            automatSelect.disabled = true;
-            mitarbeiterSelect.disabled = true;
-            speichernBtn.disabled = true;
+    clearSelect(centerSelect);
+    addOption(centerSelect, 'Wähle Center...', '');
+    if (!stadt) {
+        centerSelect.disabled = true;
+        automatSelect.disabled = true;
+        mitarbeiterSelect.disabled = true;
+        speichernBtn.disabled = true;
+        return;
+    }
+
+    const snapshot = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .get();
+
+    const centerSet = new Set();
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.center) {
+            centerSet.add(String(data.center).trim());
         }
+    });
+
+    const centers = Array.from(centerSet).sort();
+    centers.forEach(center => addOption(centerSelect, center, center));
+
+    centerSelect.disabled = centers.length === 0;
+    automatSelect.disabled = true;
+    mitarbeiterSelect.disabled = true;
+    speichernBtn.disabled = true;
+}
+
 
         async function ladeAutomatenUndMitarbeiter(stadt, center) {
             clearSelect(automatSelect);
