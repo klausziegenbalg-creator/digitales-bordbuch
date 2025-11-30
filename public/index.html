@@ -166,16 +166,18 @@
 }
 
 
-        async function ladeAutomatenUndMitarbeiter(stadt, center) {
+async function ladeAutomatenUndMitarbeiter(stadt, center) {
     clearSelect(automatSelect);
     addOption(automatSelect, 'Wähle Automat...', '');
     clearSelect(mitarbeiterSelect);
     addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
 
+    // Standard: beide Selects erstmal sperren
+    automatSelect.disabled = true;
+    mitarbeiterSelect.disabled = true;
+    speichernBtn.disabled = true;
+
     if (!stadt || !center) {
-        automatSelect.disabled = true;
-        mitarbeiterSelect.disabled = true;
-        speichernBtn.disabled = true;
         return;
     }
 
@@ -187,35 +189,32 @@
     const mitarbeiterSet = new Set();
 
     snapshot.forEach(doc => {
-    const data = doc.data();
-    console.log("AUTO-DOC:", doc.id, data);
+        const data = doc.data();
+        console.log("AUTO-DOC:", doc.id, data);
 
-    const code = (data.automatCode || data.Automat || "").toString().trim();
-    console.log("AUTO-CODE:", code, "options BEFORE:", automatSelect.options.length);
-    if (code) {
-        addOption(automatSelect, code, code);
-        console.log("OPTION ADDED, options AFTER:", automatSelect.options.length);
-    }
+        const code = (data.automatCode || data.Automat || "").toString().trim();
+        console.log("AUTO-CODE:", code);
+        if (code) {
+            addOption(automatSelect, code, code);
+        }
 
-    if (data.mitarbeiter) {
-        mitarbeiterSet.add(String(data.mitarbeiter).trim());
-    }
-});
-
+        if (data.mitarbeiter) {
+            mitarbeiterSet.add(String(data.mitarbeiter).trim());
+        }
+    });
 
     const mitarbeiterListe = Array.from(mitarbeiterSet).sort();
-mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
+    mitarbeiterListe.forEach(m => addOption(mitarbeiterSelect, m, m));
 
-// Wenn mindestens ein Automat da ist, Auswahl erlauben
-if (automatSelect.options.length > 1) {
-    automatSelect.disabled = false;
-} else {
-    automatSelect.disabled = true;
+    // Jetzt gezielt freischalten, falls Einträge vorhanden sind
+    if (automatSelect.options.length > 1) {
+        automatSelect.disabled = false;
+    }
+    if (mitarbeiterSelect.options.length > 1) {
+        mitarbeiterSelect.disabled = false;
+    }
 }
 
-// Wenn mindestens ein Mitarbeiter da ist, Auswahl erlauben
-if (mitarbeiterSelect.options.length > 1) {
-    mitarbeiterSelect.disabled = false;
 } else {
     mitarbeiterSelect.disabled = true;
 }
