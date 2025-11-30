@@ -9,235 +9,317 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
   <style>
+    :root {
+      --bg-top: #e3f2fd;
+      --bg-main: #f4f6fb;
+      --card-bg: #ffffff;
+      --accent: #1e88e5;
+      --accent-soft: #bbdefb;
+      --accent-strong: #0d47a1;
+      --danger: #ef5350;
+      --text-main: #212121;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 10px auto;
-      padding: 5px 10px 30px;
-      background: linear-gradient(180deg, #e3f2fd 0%, #f5f5f7 40%, #ffffff 100%);
+      margin: 0;
+      padding: 16px 8px 40px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
+      color: var(--text-main);
       font-size: 18px;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     h1 {
-      font-size: 28px;
-      margin: 6px 0 10px;
-      color: #1a237e;
+      font-size: 26px;
+      margin: 4px 4px 12px;
+      color: var(--accent-strong);
     }
 
     .section {
-      margin: 10px 0;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #ffffff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      border-left: 4px solid #42a5f5;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px 14px 16px;
+      margin: 10px 4px;
+      box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
+      border: 1px solid var(--accent-soft);
     }
 
-    .section h3 {
-      margin-top: 0;
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 8px;
-      font-size: 19px;
-      color: #0d47a1;
     }
 
-    select, input, textarea {
-      padding: 10px 12px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      width: 100%;
-      box-sizing: border-box;
+    .section-title {
       font-size: 18px;
+      font-weight: 600;
+      color: var(--accent-strong);
     }
 
-    label {
-      font-size: 18px;
+    .section-badge {
+      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
     }
 
-    /* Einspaltige Aufgaben-Liste */
-    .task-list {
+    .field-group {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin: 4px 0;
+      margin-top: 4px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      color: #455a64;
+    }
+
+    select, input[type="date"], input[type="number"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      font-size: 16px;
+      background: #fafafa;
+    }
+
+    select:disabled {
+      background: #eceff1;
+      color: #90a4ae;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    /* Einspaltige Checkliste */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
     }
 
     .task-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #fafafa;
+      border: 1px solid #eceff1;
+    }
+
+    .task-row:nth-child(odd) {
+      background: #fdfbff;
     }
 
     .task-row input[type="checkbox"] {
-      transform: scale(1.4);
+      width: 24px;
+      height: 24px;
       margin: 0;
+      accent-color: var(--accent);
       flex-shrink: 0;
     }
 
     .task-label {
       flex: 1;
+      font-size: 16px;
+    }
+
+    /* Zweispaltige Bestände auf großen Screens, sonst einspaltig */
+    .stock-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .stock-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    @media (min-width: 640px) {
+      .stock-grid {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     button {
-      background: #1e88e5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--accent);
       color: white;
-      padding: 10px 22px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 6px;
+      border-radius: 999px;
       font-size: 18px;
       cursor: pointer;
-      margin-top: 12px;
+      margin: 14px 4px 0;
+      box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button:hover {
+    button span.icon {
+      font-size: 20px;
+    }
+
+    button:hover:not(:disabled) {
       background: #1565c0;
     }
 
     button:disabled {
-      background: #ccc;
+      background: #b0bec5;
+      box-shadow: none;
       cursor: not-allowed;
     }
 
-    .success {
-      background: #34a853;
-      color: white;
-      padding: 10px;
-      border-radius: 6px;
-      margin: 10px 0;
+    #status {
+      margin: 10px 4px 0;
+      font-size: 15px;
+    }
+
+    #status.ok {
+      color: var(--accent-strong);
+    }
+
+    #status.err {
+      color: var(--danger);
     }
   </style>
 </head>
 <body>
-  <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
+  <div class="page">
+    <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
 
-  <div class="section">
-    <h3>1. Automat auswählen</h3>
-    <select id="stadtSelect"><option>Wähle Stadt...</option></select>
-    <select id="centerSelect" disabled><option>Wähle Center...</option></select>
-    <select id="automatSelect" disabled><option>Wähle Automat...</option></select>
-    <input type="date" id="datum" />
-    <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
-  </div>
-
-  <div class="section">
-    <h3>2. Aufgaben pro Automat</h3>
-    <div class="task-list">
-      <div class="task-row">
-        <input type="checkbox" id="zucker" />
-        <div class="task-label">Zucker auffüllen</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">1. Automat auswählen</div>
+        <div class="section-badge">Pflichtangaben</div>
       </div>
-      <div class="task-row">
-        <input type="checkbox" id="wasser" />
-        <div class="task-label">Wasser auffüllen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="staebe" />
-        <div class="task-label">Stäbe auffüllen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="zuckerfach" />
-        <div class="task-label">Zuckerfach reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="faecher" />
-        <div class="task-label">Alle Fächer reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="abwasser" />
-        <div class="task-label">Abwasser entleeren</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="produktionsraum" />
-        <div class="task-label">Produktionsraum reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="messer" />
-        <div class="task-label">Messer + Rädchen reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="roboterarm" />
-        <div class="task-label">Roboterarm gründlich reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="sieb" />
-        <div class="task-label">Sieb oben reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="auffangschale" />
-        <div class="task-label">Auffangschale reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="aufbewahrung" />
-        <div class="task-label">Aufbewahrungsfach aufräumen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="aussen" />
-        <div class="task-label">Automat außen reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="scheiben" />
-        <div class="task-label">Scheiben reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="brennerkopf" />
-        <div class="task-label">Brennerkopf reinigen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="duese" />
-        <div class="task-label">Düse hinter Brennerkopf reinigen</div>
+      <div class="field-group">
+        <div>
+          <label for="stadtSelect">Stadt</label>
+          <select id="stadtSelect"><option>Wähle Stadt...</option></select>
+        </div>
+        <div>
+          <label for="centerSelect">Center</label>
+          <select id="centerSelect" disabled><option>Wähle Center...</option></select>
+        </div>
+        <div>
+          <label for="automatSelect">Automat</label>
+          <select id="automatSelect" disabled><option>Wähle Automat...</option></select>
+        </div>
+        <div>
+          <label for="datum">Datum</label>
+          <input type="date" id="datum" />
+        </div>
+        <div>
+          <label for="mitarbeiterSelect">Mitarbeiter</label>
+          <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="section">
-    <h3>3. Bestände (angefangen ≥ 50% = 0,5)</h3>
-    <label>Roter Zucker:
-      <input type="number" id="zucker_rot" step="0.5" min="0" max="10" />
-    </label>
-    <label>Gelber Zucker:
-      <input type="number" id="zucker_gelb" step="0.5" min="0" max="10" />
-    </label>
-    <label>Blauer Zucker:
-      <input type="number" id="zucker_blau" step="0.5" min="0" max="10" />
-    </label>
-    <label>Weißer Zucker:
-      <input type="number" id="zucker_weiss" step="0.5" min="0" max="10" />
-    </label>
-    <label>Weinrot:
-      <input type="number" id="zucker_weinrot" step="0.5" min="0" max="10" />
-    </label>
-    <label>Grün:
-      <input type="number" id="zucker_gruen" step="0.5" min="0" max="10" />
-    </label>
-  </div>
-
-  <div class="section">
-    <h3>4. Funktionsprüfung</h3>
-    <div class="task-list">
-      <div class="task-row">
-        <input type="checkbox" id="befuchtung" />
-        <div class="task-label">Befeuchtungstest</div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">2. Aufgaben pro Automat</div>
+        <div class="section-badge">Ankreuzen</div>
       </div>
-      <div class="task-row">
-        <input type="checkbox" id="reinigungstest" />
-        <div class="task-label">Reinigungstest</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="stabgenommen" />
-        <div class="task-label">Automat. neuen Stab genommen</div>
-      </div>
-      <div class="task-row">
-        <input type="checkbox" id="roboterwinkel" />
-        <div class="task-label">Roboterarm 90° Winkel</div>
+      <div class="task-list">
+        <div class="task-row"><input type="checkbox" id="zucker"><div class="task-label">Zucker auffüllen</div></div>
+        <div class="task-row"><input type="checkbox" id="wasser"><div class="task-label">Wasser auffüllen</div></div>
+        <div class="task-row"><input type="checkbox" id="staebe"><div class="task-label">Stäbe auffüllen</div></div>
+        <div class="task-row"><input type="checkbox" id="zuckerfach"><div class="task-label">Zuckerfach reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="faecher"><div class="task-label">Alle Fächer reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="abwasser"><div class="task-label">Abwasser entleeren</div></div>
+        <div class="task-row"><input type="checkbox" id="produktionsraum"><div class="task-label">Produktionsraum reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="messer"><div class="task-label">Messer + Rädchen reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="roboterarm"><div class="task-label">Roboterarm gründlich reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="sieb"><div class="task-label">Sieb oben reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="auffangschale"><div class="task-label">Auffangschale reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="aufbewahrung"><div class="task-label">Aufbewahrungsfach aufräumen</div></div>
+        <div class="task-row"><input type="checkbox" id="aussen"><div class="task-label">Automat außen reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="scheiben"><div class="task-label">Scheiben reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="brennerkopf"><div class="task-label">Brennerkopf reinigen</div></div>
+        <div class="task-row"><input type="checkbox" id="duese"><div class="task-label">Düse hinter Brennerkopf reinigen</div></div>
       </div>
     </div>
-    <label>Auffälligkeiten:
-      <textarea id="auffaelligkeiten" rows="3" placeholder="Alles ok oder Probleme notieren..."></textarea>
-    </label>
-  </div>
 
-  <button id="speichernBtn" disabled onclick="speichernProtokoll()">✅ Protokoll speichern</button>
-  <div id="status"></div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">3. Bestände (angefangen ≥ 50 % = 0,5)</div>
+        <div class="section-badge">Füllstände</div>
+      </div>
+      <div class="stock-grid">
+        <div class="stock-field">
+          <label for="zucker_rot">Roter Zucker</label>
+          <input type="number" id="zucker_rot" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_gelb">Gelber Zucker</label>
+          <input type="number" id="zucker_gelb" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_blau">Blauer Zucker</label>
+          <input type="number" id="zucker_blau" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_weiss">Weißer Zucker</label>
+          <input type="number" id="zucker_weiss" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_weinrot">Weinrot</label>
+          <input type="number" id="zucker_weinrot" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_gruen">Grün</label>
+          <input type="number" id="zucker_gruen" step="0.5" min="0" max="10">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">4. Funktionsprüfung</div>
+        <div class="section-badge">Testläufe</div>
+      </div>
+      <div class="task-list">
+        <div class="task-row"><input type="checkbox" id="befuchtung"><div class="task-label">Befeuchtungstest</div></div>
+        <div class="task-row"><input type="checkbox" id="reinigungstest"><div class="task-label">Reinigungstest</div></div>
+        <div class="task-row"><input type="checkbox" id="stabgenommen"><div class="task-label">Automat. neuen Stab genommen</div></div>
+        <div class="task-row"><input type="checkbox" id="roboterwinkel"><div class="task-label">Roboterarm 90° Winkel</div></div>
+      </div>
+      <div style="margin-top:10px;">
+        <label for="auffaelligkeiten">Auffälligkeiten</label>
+        <textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
+      </div>
+    </div>
+
+    <button id="speichernBtn" disabled onclick="speichernProtokoll()">
+      <span class="icon">✅</span>
+      <span>Protokoll speichern</span>
+    </button>
+    <div id="status"></div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -285,7 +367,9 @@
         if (data.stadt) staedteSet.add(String(data.stadt).trim());
       });
 
-      Array.from(staedteSet).sort().forEach(stadt => addOption(stadtSelect, stadt, stadt));
+      Array.from(staedteSet).sort().forEach(stadt =>
+        addOption(stadtSelect, stadt, stadt)
+      );
 
       stadtSelect.disabled = false;
       centerSelect.disabled = true;
@@ -343,7 +427,9 @@
         if (data.mitarbeiter) mitarbeiterSet.add(String(data.mitarbeiter).trim());
       });
 
-      Array.from(mitarbeiterSet).sort().forEach(m => addOption(mitarbeiterSelect, m, m));
+      Array.from(mitarbeiterSet).sort().forEach(m =>
+        addOption(mitarbeiterSelect, m, m)
+      );
 
       if (automatSelect.options.length > 1) automatSelect.disabled = false;
       if (mitarbeiterSelect.options.length > 1) mitarbeiterSelect.disabled = false;
@@ -376,7 +462,7 @@
       if (speichernBtn.disabled) return;
 
       speichernBtn.disabled = true;
-      statusDiv.textContent = 'Speichere...';
+      statusDiv.textContent = 'Speichere…';
       statusDiv.className = '';
 
       try {
@@ -417,18 +503,18 @@
         };
 
         await db.collection('reinigungen').add(data);
-        statusDiv.textContent = '✅ Protokoll gespeichert!';
-        statusDiv.className = 'success';
+        statusDiv.textContent = '✅ Protokoll gespeichert';
+        statusDiv.className = 'ok';
 
-        Array.from(document.querySelectorAll('input[type=checkbox]')).forEach(cb => cb.checked = false);
-        Array.from(document.querySelectorAll('input[type=number]')).forEach(nb => nb.value = '');
+        document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '');
         document.getElementById('auffaelligkeiten').value = '';
         automatSelect.value = '';
         mitarbeiterSelect.value = '';
         pruefeFormular();
-      } catch (error) {
-        statusDiv.textContent = '❌ Fehler beim Speichern: ' + error.message;
-        statusDiv.className = '';
+      } catch (err) {
+        statusDiv.textContent = '❌ Fehler beim Speichern: ' + err.message;
+        statusDiv.className = 'err';
         speichernBtn.disabled = false;
       }
     }
@@ -437,4 +523,5 @@
   </script>
 </body>
 </html>
+
 
