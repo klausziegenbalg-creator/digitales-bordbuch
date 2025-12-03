@@ -1,6 +1,200 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+  <meta charset="UTF-8" />
+  <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-top: #e3f2fd;
+      --bg-main: #f4f6fb;
+      --card-bg: #ffffff;
+      --accent: #1e88e5;
+      --accent-soft: #bbdefb;
+      --accent-strong: #0d47a1;
+      --danger: #ef5350;
+      --text-main: #212121;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px 10px 46px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
+      color: var(--text-main);
+      font-size: 34px;          /* noch größer für Handy */
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 44px;
+      margin: 4px 4px 16px;
+      color: var(--accent-strong);
+    }
+
+    .section {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 20px 20px 22px;
+      margin: 14px 4px;
+      box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
+      border: 1px solid var(--accent-soft);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--accent-strong);
+    }
+
+    .section-badge {
+      font-size: 22px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    label {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      color: #455a64;
+    }
+
+    select, input[type="date"], input[type="number"], textarea {
+      width: 100%;
+      padding: 20px 22px;
+      margin: 2px 0 0;
+      border-radius: 12px;
+      border: 1px solid #cfd8dc;
+      font-size: 30px;
+      background: #fafafa;
+    }
+
+    select:disabled {
+      background: #eceff1;
+      color: #90a4ae;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: #fafafa;
+      border: 1px solid #eceff1;
+    }
+
+    .task-row:nth-child(odd) {
+      background: #fdfbff;
+    }
+
+    .task-row input[type="checkbox"] {
+      width: 38px;
+      height: 38px;
+      margin: 0;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .task-label {
+      flex: 1;
+      font-size: 30px;
+    }
+
+    .stock-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .stock-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: var(--accent);
+      color: white;
+      padding: 20px 38px;
+      border: none;
+      border-radius: 999px;
+      font-size: 32px;
+      cursor: pointer;
+      margin: 20px 4px 0;
+      box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
+    }
+
+    button span.icon { font-size: 34px; }
+
+    button:hover:not(:disabled) { background: #1565c0; }
+
+    button:disabled {
+      background: #b0bec5;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin: 16px 4px 0;
+      font-size: 24px;
+    }
+
+    #status.ok { color: var(--accent-strong); }
+    #status.err { color: var(--danger); }
+
+    @media (min-width: 700px) {
+      .stock-grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .stock-field {
+        width: 48%;
+      }
+    }
+  </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ihre App</title>
@@ -39,10 +233,349 @@
     </style>
 </head>
 <body>
+  <div class="page">
+    <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">1. Automat auswählen</div>
+        <div class="section-badge">Pflichtangaben</div>
+      </div>
+      <div class="field-group">
+        <div>
+          <label for="stadtSelect">Stadt</label>
+          <select id="stadtSelect"><option>Wähle Stadt...</option></select>
+        </div>
+        <div>
+          <label for="centerSelect">Center</label>
+          <select id="centerSelect" disabled><option>Wähle Center...</option></select>
+        </div>
+        <div>
+          <label for="automatSelect">Automat</label>
+          <select id="automatSelect" disabled><option>Wähle Automat...</option></select>
+        </div>
+        <div>
+          <label for="datum">Datum</label>
+          <input type="date" id="datum" />
+        </div>
+        <div>
+          <label for="mitarbeiterSelect">Mitarbeiter</label>
+          <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
+        </div>
+      </div>
     <div class="app-container">
         <h1>Willkommen in Ihrer App</h1>
         <p>Diese App wurde vollständig an die verdoppelte Schriftartgröße angepasst.</p>
         <button>Beispiel-Button</button>
     </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">2. Aufgaben pro Automat</div>
+        <div class="section-badge">Ankreuzen</div>
+      </div>
+      <div class="task-list">
+        <div class="task-row"><input type="checkbox" id="zucker"><div class="task-label">Zucker aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="wasser"><div class="task-label">Wasser aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="staebe"><div class="task-label">Stäbe aufgefüllt</div></div>
+        <div class="task-row"><input type="checkbox" id="zuckerfach"><div class="task-label">Zuckerfach gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="faecher"><div class="task-label">Alle Fächer gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="abwasser"><div class="task-label">Abwasser entleert</div></div>
+        <div class="task-row"><input type="checkbox" id="produktionsraum"><div class="task-label">Produktionsraum gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="messer"><div class="task-label">Messer + Rädchen gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="roboterarm"><div class="task-label">Roboterarm gründlich gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="sieb"><div class="task-label">Sieb oben gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="auffangschale"><div class="task-label">Auffangschale gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="aufbewahrung"><div class="task-label">Aufbewahrungsfach aufgeräumt</div></div>
+        <div class="task-row"><input type="checkbox" id="aussen"><div class="task-label">Automat außen gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="scheiben"><div class="task-label">Scheiben gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="brennerkopf"><div class="task-label">Brennerkopf gereinigt</div></div>
+        <div class="task-row"><input type="checkbox" id="duese"><div class="task-label">Düse hinter Brennerkopf gereinigt</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">3. Bestände (angefangen ≥ 50 % = 0,5)</div>
+        <div class="section-badge">Füllstände</div>
+      </div>
+      <div class="stock-grid">
+        <div class="stock-field">
+          <label for="zucker_rot">Roter Zucker</label>
+          <input type="number" id="zucker_rot" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_gelb">Gelber Zucker</label>
+          <input type="number" id="zucker_gelb" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_blau">Blauer Zucker</label>
+          <input type="number" id="zucker_blau" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="zucker_weiss">Weißer Zucker</label>
+          <input type="number" id="zucker_weiss" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field" id="feld_weinrot">
+          <label for="zucker_weinrot">Weinrot</label>
+          <input type="number" id="zucker_weinrot" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field" id="feld_gruen">
+          <label for="zucker_gruen">Grün</label>
+          <input type="number" id="zucker_gruen" step="0.5" min="0" max="10">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">4. Funktionsprüfung</div>
+        <div class="section-badge">Testläufe</div>
+      </div>
+      <div class="task-list">
+        <div class="task-row"><input type="checkbox" id="befuchtung"><div class="task-label">Befeuchtungstest</div></div>
+        <div class="task-row"><input type="checkbox" id="reinigungstest"><div class="task-label">Reinigungstest</div></div>
+        <div class="task-row"><input type="checkbox" id="stabgenommen"><div class="task-label">Automat. neuen Stab genommen</div></div>
+        <div class="task-row"><input type="checkbox" id="roboterwinkel"><div class="task-label">Roboterarm 90° Winkel</div></div>
+      </div>
+      <div style="margin-top:12px;">
+        <label for="auffaelligkeiten">Auffälligkeiten</label>
+        <textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
+      </div>
+    </div>
+
+    <button id="speichernBtn" disabled onclick="speichernProtokoll()">
+      <span class="icon">✅</span>
+      <span>Protokoll speichern</span>
+    </button>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
+      authDomain: "digitales-bordbuch.firebaseapp.com",
+      projectId: "digitales-bordbuch",
+      storageBucket: "digitales-bordbuch.firebasestorage.app",
+      messagingSenderId: "612073997080",
+      appId: "1:612073997080:web:762cec6c160eab6f84546d",
+      measurementId: "G-509LRCRV66"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const stadtSelect = document.getElementById('stadtSelect');
+    const centerSelect = document.getElementById('centerSelect');
+    const automatSelect = document.getElementById('automatSelect');
+    const mitarbeiterSelect = document.getElementById('mitarbeiterSelect');
+    const datumInput = document.getElementById('datum');
+    const speichernBtn = document.getElementById('speichernBtn');
+    const statusDiv = document.getElementById('status');
+
+    const feldWeinrot = document.getElementById('feld_weinrot');
+    const feldGruen = document.getElementById('feld_gruen');
+
+    const heute = new Date().toISOString().split('T')[0];
+    datumInput.value = heute;
+
+    function clearSelect(select) { select.innerHTML = ''; }
+
+    function addOption(select, text, value) {
+      const option = document.createElement('option');
+      option.textContent = text;
+      option.value = value;
+      select.appendChild(option);
+    }
+
+    function updateFarbfelderSichtbarkeit() {
+      const center = centerSelect.value || "";
+      const sichtbar = center === "Phönix";
+      feldWeinrot.style.display = sichtbar ? "flex" : "none";
+      feldGruen.style.display = sichtbar ? "flex" : "none";
+      if (!sichtbar) {
+        document.getElementById('zucker_weinrot').value = "";
+        document.getElementById('zucker_gruen').value = "";
+      }
+    }
+
+    async function ladeStaedte() {
+      clearSelect(stadtSelect);
+      addOption(stadtSelect, 'Wähle Stadt...', '');
+
+      const snapshot = await db.collection('automaten').get();
+
+      const staedteSet = new Set();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.stadt) staedteSet.add(String(data.stadt).trim());
+      });
+
+      Array.from(staedteSet).sort().forEach(stadt =>
+        addOption(stadtSelect, stadt, stadt)
+      );
+
+      stadtSelect.disabled = false;
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      speichernBtn.disabled = true;
+
+      updateFarbfelderSichtbarkeit();
+    }
+
+    async function ladeCenter(stadt) {
+      clearSelect(centerSelect);
+      addOption(centerSelect, 'Wähle Center...', '');
+
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      speichernBtn.disabled = true;
+
+      if (!stadt) {
+        updateFarbfelderSichtbarkeit();
+        return;
+      }
+
+      const snapshot = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .get();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.center) addOption(centerSelect, String(data.center), String(data.center));
+      });
+
+      if (centerSelect.options.length > 1) centerSelect.disabled = false;
+
+      updateFarbfelderSichtbarkeit();
+    }
+
+    async function ladeAutomatenUndMitarbeiter(stadt, center) {
+      clearSelect(automatSelect);
+      addOption(automatSelect, 'Wähle Automat...', '');
+      clearSelect(mitarbeiterSelect);
+      addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
+
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      speichernBtn.disabled = true;
+
+      if (!stadt || !center) {
+        updateFarbfelderSichtbarkeit();
+        return;
+      }
+
+      const snapshot = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .where('center', '==', center)
+        .get();
+
+      const mitarbeiterSet = new Set();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const code = (data.automatCode || data.Automat || "").toString().trim();
+        if (code) addOption(automatSelect, code, code);
+        if (data.mitarbeiter) mitarbeiterSet.add(String(data.mitarbeiter).trim());
+      });
+
+      Array.from(mitarbeiterSet).sort().forEach(m =>
+        addOption(mitarbeiterSelect, m, m)
+      );
+
+      if (automatSelect.options.length > 1) automatSelect.disabled = false;
+      if (mitarbeiterSelect.options.length > 1) mitarbeiterSelect.disabled = false;
+
+      updateFarbfelderSichtbarkeit();
+    }
+
+    function pruefeFormular() {
+      const stadt = stadtSelect.value;
+      const center = centerSelect.value;
+      const automat = automatSelect.value;
+      const mitarbeiter = mitarbeiterSelect.value;
+      const datum = datumInput.value;
+      speichernBtn.disabled = !(stadt && center && automat && mitarbeiter && datum);
+    }
+
+    stadtSelect.addEventListener('change', async () => {
+      await ladeCenter(stadtSelect.value);
+      pruefeFormular();
+    });
+
+    centerSelect.addEventListener('change', async () => {
+      await ladeAutomatenUndMitarbeiter(stadtSelect.value, centerSelect.value);
+      pruefeFormular();
+    });
+
+    automatSelect.addEventListener('change', pruefeFormular);
+    mitarbeiterSelect.addEventListener('change', pruefeFormular);
+    datumInput.addEventListener('change', pruefeFormular);
+
+    async function speichernProtokoll() {
+      if (speichernBtn.disabled) return;
+
+      speichernBtn.disabled = true;
+      statusDiv.textContent = 'Speichere…';
+      statusDiv.className = '';
+
+      try {
+        const data = {
+          automatCode: automatSelect.value,
+          stadt: stadtSelect.value,
+          center: centerSelect.value,
+          datum: new Date(datumInput.value),
+          mitarbeiter: mitarbeiterSelect.value,
+          zucker_aufgefuellt: document.getElementById('zucker').checked,
+          wasser_aufgefuellt: document.getElementById('wasser').checked,
+          staebe_aufgefuellt: document.getElementById('staebe').checked,
+          zuckerfach_gereinigt: document.getElementById('zuckerfach').checked,
+          faecher_gereinigt: document.getElementById('faecher').checked,
+          abwasser_entleert: document.getElementById('abwasser').checked,
+          produktionsraum_gereinigt: document.getElementById('produktionsraum').checked,
+          messer_gereinigt: document.getElementById('messer').checked,
+          roboterarm_gereinigt: document.getElementById('roboterarm').checked,
+          sieb_gereinigt: document.getElementById('sieb').checked,
+          auffangschale_gereinigt: document.getElementById('auffangschale').checked,
+          aufbewahrung_aufgeraeumt: document.getElementById('aufbewahrung').checked,
+          automat_aussen_gereinigt: document.getElementById('aussen').checked,
+          scheiben_gereinigt: document.getElementById('scheiben').checked,
+          brennerkopf_gereinigt: document.getElementById('brennerkopf').checked,
+          duese_gereinigt: document.getElementById('duese').checked,
+          zucker_rot: parseFloat(document.getElementById('zucker_rot').value) || 0,
+          zucker_gelb: parseFloat(document.getElementById('zucker_gelb').value) || 0,
+          zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
+          zucker_weiss: parseFloat(document.getElementById('zucker_weiss').value) || 0,
+          zucker_weinrot: parseFloat(document.getElementById('zucker_weinrot').value) || 0,
+          zucker_gruen: parseFloat(document.getElementById('zucker_gruen').value) || 0,
+          befeuchtungstest: document.getElementById('befuchtung').checked,
+          reinigungstest: document.getElementById('reinigungstest').checked,
+          stabgenommen: document.getElementById('stabgenommen').checked,
+          roboterwinkel: document.getElementById('roboterwinkel').checked,
+          auffaelligkeiten: document.getElementById('auffaelligkeiten').value.trim(),
+          erstelltAm: new Date()
+        };
+
+        await db.collection('reinigungen').add(data);
+        statusDiv.textContent = '✅ Protokoll gespeichert';
+        statusDiv.className = 'ok';
+
+        document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '');
+        document.getElementById('auffaelligkeiten').value = '';
+        automatSelect.value = '';
+        mitarbeiterSelect.value = '';
+        pruefeFormular();
+      } catch (err) {
+        statusDiv.textContent = '❌ Fehler beim Speichern: ' + err.message;
+        statusDiv.className = 'err';
+        speichernBtn.disabled = false;
+      }
+    }
+
+    ladeStaedte();
+  </script>
 </body>
 </html>
