@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
 
+  <!-- Firebase (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
@@ -23,11 +24,11 @@
 
     body {
       margin: 0;
-      padding: 20px 10px 46px;
+      padding: 18px 10px 40px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 34px;          /* noch größer für Handy */
+      font-size: 24px;              /* etwas kleiner als vorher */
     }
 
     .page {
@@ -36,16 +37,16 @@
     }
 
     h1 {
-      font-size: 44px;
-      margin: 4px 4px 16px;
+      font-size: 32px;
+      margin: 4px 4px 14px;
       color: var(--accent-strong);
     }
 
     .section {
       background: var(--card-bg);
-      border-radius: 18px;
-      padding: 20px 20px 22px;
-      margin: 14px 4px;
+      border-radius: 16px;
+      padding: 16px 16px 18px;
+      margin: 12px 4px;
       box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
       border: 1px solid var(--accent-soft);
     }
@@ -54,18 +55,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 22px;
-      padding: 5px 14px;
+      font-size: 14px;
+      padding: 3px 10px;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent-strong);
@@ -74,24 +75,27 @@
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       margin-top: 4px;
     }
 
     label {
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
     }
 
-    select, input[type="date"], input[type="number"], textarea {
+    select,
+    input[type="date"],
+    input[type="number"],
+    textarea {
       width: 100%;
-      padding: 20px 22px;
+      padding: 14px 16px;
       margin: 2px 0 0;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid #cfd8dc;
-      font-size: 30px;
+      font-size: 20px;
       background: #fafafa;
     }
 
@@ -102,22 +106,22 @@
 
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 80px;
     }
 
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
+      margin-top: 6px;
     }
 
     .task-row {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      border-radius: 14px;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
       background: #fafafa;
       border: 1px solid #eceff1;
     }
@@ -127,8 +131,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 38px;
-      height: 38px;
+      width: 26px;
+      height: 26px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -136,14 +140,14 @@
 
     .task-label {
       flex: 1;
-      font-size: 30px;
+      font-size: 20px;
     }
 
     .stock-grid {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 6px;
     }
 
     .stock-field {
@@ -155,19 +159,19 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 8px;
       background: var(--accent);
       color: white;
-      padding: 20px 38px;
+      padding: 14px 24px;
       border: none;
       border-radius: 999px;
-      font-size: 32px;
+      font-size: 20px;
       cursor: pointer;
-      margin: 20px 4px 0;
+      margin: 16px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 34px; }
+    button span.icon { font-size: 22px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -178,8 +182,8 @@
     }
 
     #status {
-      margin: 16px 4px 0;
-      font-size: 24px;
+      margin: 12px 4px 0;
+      font-size: 16px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -195,42 +199,6 @@
       }
     }
   </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ihre App</title>
-    <style>
-        /* Basis-Schriftgröße verdoppelt: 16px → 32px */
-        html {
-            font-size: 32px; /* Verdoppelt von Standard 16px */
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 1rem; /* Entspricht nun 32px */
-            line-height: 1.4;
-            margin: 0;
-            padding: 2rem;
-            color: #333;
-        }
-        
-        h1 { font-size: 2.5rem; /* Verdoppelt von ~40px → 80px */ }
-        h2 { font-size: 2rem;   /* Verdoppelt von ~32px → 64px */ }
-        h3 { font-size: 1.75rem; /* Verdoppelt von ~28px → 56px */ }
-        p, li, label { font-size: 1rem; /* 32px */ }
-        
-        button, input, select, textarea {
-            font-size: 1rem; /* 32px, verdoppelt */
-            padding: 1rem 2rem; /* Proportional angepasst */
-        }
-        
-        /* Responsives Design für kleinere Bildschirme (reduziert Übergröße) */
-        @media (max-width: 768px) {
-            html { font-size: 24px; } /* Leichte Reduktion auf Mobile */
-        }
-        
-        /* Weitere App-spezifische Elemente anpassen, falls vorhanden */
-        .app-container { max-width: 1200px; margin: 0 auto; }
-    </style>
 </head>
 <body>
   <div class="page">
@@ -263,6 +231,8 @@
           <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
         </div>
       </div>
+    </div>
+
     <div class="section">
       <div class="section-header">
         <div class="section-title">2. Aufgaben pro Automat</div>
