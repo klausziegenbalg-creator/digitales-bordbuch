@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
 
-  <!-- Firebase (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
@@ -24,11 +23,11 @@
 
     body {
       margin: 0;
-      padding: 18px 10px 40px;
+      padding: 20px 14px 44px;   /* mehr Rand links/rechts */
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 24px;              /* etwas kleiner als vorher */
+      font-size: 20px;           /* kleiner für Handy */
     }
 
     .page {
@@ -37,7 +36,7 @@
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 28px;
       margin: 4px 4px 14px;
       color: var(--accent-strong);
     }
@@ -46,7 +45,7 @@
       background: var(--card-bg);
       border-radius: 16px;
       padding: 16px 16px 18px;
-      margin: 12px 4px;
+      margin: 12px 2px;
       box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
       border: 1px solid var(--accent-soft);
     }
@@ -55,17 +54,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .section-title {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 14px;
+      font-size: 13px;
       padding: 3px 10px;
       border-radius: 999px;
       background: var(--accent-soft);
@@ -80,7 +79,7 @@
     }
 
     label {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
@@ -91,11 +90,11 @@
     input[type="number"],
     textarea {
       width: 100%;
-      padding: 14px 16px;
+      padding: 12px 14px;
       margin: 2px 0 0;
       border-radius: 10px;
       border: 1px solid #cfd8dc;
-      font-size: 20px;
+      font-size: 18px;
       background: #fafafa;
     }
 
@@ -106,21 +105,21 @@
 
     textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 70px;
     }
 
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       margin-top: 6px;
     }
 
     .task-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
+      gap: 8px;
+      padding: 10px 12px;
       border-radius: 12px;
       background: #fafafa;
       border: 1px solid #eceff1;
@@ -131,8 +130,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -140,13 +139,13 @@
 
     .task-label {
       flex: 1;
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .stock-grid {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       margin-top: 6px;
     }
 
@@ -159,19 +158,19 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       background: var(--accent);
       color: white;
-      padding: 14px 24px;
+      padding: 12px 22px;
       border: none;
       border-radius: 999px;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
-      margin: 16px 4px 0;
+      margin: 18px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 22px; }
+    button span.icon { font-size: 20px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -182,8 +181,8 @@
     }
 
     #status {
-      margin: 12px 4px 0;
-      font-size: 16px;
+      margin: 10px 4px 0;
+      font-size: 14px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -302,7 +301,7 @@
         <div class="task-row"><input type="checkbox" id="stabgenommen"><div class="task-label">Automat. neuen Stab genommen</div></div>
         <div class="task-row"><input type="checkbox" id="roboterwinkel"><div class="task-label">Roboterarm 90° Winkel</div></div>
       </div>
-      <div style="margin-top:12px;">
+      <div style="margin-top:10px;">
         <label for="auffaelligkeiten">Auffälligkeiten</label>
         <textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
       </div>
@@ -527,7 +526,7 @@
         statusDiv.className = 'ok';
 
         document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '');
+        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '';
         document.getElementById('auffaelligkeiten').value = '';
         automatSelect.value = '';
         mitarbeiterSelect.value = '';
@@ -543,3 +542,4 @@
   </script>
 </body>
 </html>
+
