@@ -35,7 +35,6 @@
       margin: 0 auto;
     }
 
-    /* H1 bleibt wie gewünscht groß */
     h1 {
       font-size: 52px;
       margin: 4px 4px 14px;
@@ -91,12 +90,17 @@
     input[type="number"],
     textarea {
       width: 100%;
+      max-width: 100%;
       padding: 16px 16px;
       margin: 2px 0 0;
       border-radius: 10px;
       border: 1px solid #cfd8dc;
       font-size: 26px;
       background: #fafafa;
+    }
+
+    input[type="date"] {
+      display: block;
     }
 
     select:disabled {
@@ -162,10 +166,10 @@
       gap: 8px;
       background: var(--accent);
       color: white;
-      padding: 18px 30px;      /* etwas größer */
+      padding: 18px 30px;
       border: none;
       border-radius: 999px;
-      font-size: 36px;          /* Button +40 % */
+      font-size: 36px; /* +40 % */
       cursor: pointer;
       margin: 18px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
@@ -199,9 +203,18 @@
       }
     }
 
-    /* 1. Abschnitt: Stadt / Center / Automat / Datum / Mitarbeiter +40% */
+    /* 1. Automat auswählen: alles +30 % */
+    .section-auswahl .section-title {
+      font-size: 34px;
+    }
+
+    .section-auswahl .section-badge {
+      font-size: 21px;
+      padding: 5px 13px;
+    }
+
     .section-auswahl label {
-      font-size: 28px;
+      font-size: 26px;
     }
 
     .section-auswahl select,
@@ -210,23 +223,19 @@
       padding: 18px 18px;
     }
 
-    .section-auswahl input[type="date"] {
-      box-sizing: border-box;
-    }
-
-    /* 2. Aufgaben: Überschrift +30 %, Texte +40 % */
+    /* 2. Aufgaben: Überschrift +20 %, Inhalt +20 % */
     .section-aufgaben .section-title {
-      font-size: 34px;          /* 26px → +~30 % */
+      font-size: 31px; /* 26px → +20 % */
     }
 
     .section-aufgaben .section-badge {
-      font-size: 21px;
+      font-size: 19px;
       padding: 5px 13px;
     }
 
     .section-aufgaben .task-row {
       gap: 12px;
-      padding: 16px 18px;
+      padding: 14px 16px;
     }
 
     .section-aufgaben .task-row input[type="checkbox"] {
@@ -235,21 +244,21 @@
     }
 
     .section-aufgaben .task-label {
-      font-size: 36px;          /* ~ +40 % */
+      font-size: 31px; /* ~+20 % auf 26 */
     }
 
-    /* 3. Bestände: +50 % */
+    /* 3. Bestände: +30 % */
     .section-bestaende .section-title {
-      font-size: 39px;
+      font-size: 34px;
     }
 
     .section-bestaende .section-badge {
-      font-size: 24px;
-      padding: 6px 14px;
+      font-size: 21px;
+      padding: 5px 13px;
     }
 
     .section-bestaende label {
-      font-size: 30px;
+      font-size: 26px;
     }
 
     .section-bestaende input[type="number"] {
@@ -290,7 +299,7 @@
   <div class="page">
     <h1>🧹 Reinigungsprotokoll Automaten</h1>
 
-    <!-- Abschnitt 1: Auswahl -->
+    <!-- 1. Automat auswählen -->
     <div class="section section-auswahl">
       <div class="section-header">
         <div class="section-title">1. Automat auswählen</div>
@@ -320,7 +329,7 @@
       </div>
     </div>
 
-    <!-- Abschnitt 2: Aufgaben -->
+    <!-- 2. Aufgaben pro Automat -->
     <div class="section section-aufgaben">
       <div class="section-header">
         <div class="section-title">2. Aufgaben pro Automat</div>
@@ -346,7 +355,7 @@
       </div>
     </div>
 
-    <!-- Abschnitt 3: Bestände -->
+    <!-- 3. Bestände -->
     <div class="section section-bestaende">
       <div class="section-header">
         <div class="section-title">3. Bestände (angefangen ≥ 50 % = 0,5)</div>
@@ -380,7 +389,7 @@
       </div>
     </div>
 
-    <!-- Abschnitt 4: Funktionsprüfung -->
+    <!-- 4. Funktionsprüfung -->
     <div class="section section-funktion">
       <div class="section-header">
         <div class="section-title">4. Funktionsprüfung</div>
@@ -617,7 +626,7 @@
         statusDiv.className = 'ok';
 
         document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[type=number]').forEach	nb => nb.value = '';
+        document.querySelectorAll('input[type=number]').forEach nb => nb.value = '';
         document.getElementById('auffaelligkeiten').value = '';
         automatSelect.value = '';
         mitarbeiterSelect.value = '';
@@ -633,4 +642,5 @@
   </script>
 </body>
 </html>
+
 
