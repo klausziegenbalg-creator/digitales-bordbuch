@@ -57,7 +57,6 @@
       margin-bottom: 14px;
     }
 
-    /* Abschnitt 1 & 2 Überschrift größe 54px (32px + 70%) */
     .section:nth-of-type(1) .section-title,
     .section:nth-of-type(2) .section-title {
       font-size: 38px;
@@ -65,7 +64,6 @@
       color: var(--accent-strong);
     }
 
-    /* Abschnitt 3 & 4 Überschrift 30% reduziert auf 38px */
     .section:nth-of-type(3) .section-title,
     .section:nth-of-type(4) .section-title {
       font-size: 38px;
@@ -88,7 +86,6 @@
       margin-top: 4px;
     }
 
-    /* Schriftgröße Label für Stadt, Center, Automat, Datum, Mitarbeiter 38px (60% größer) */
     label[for="stadtSelect"],
     label[for="centerSelect"],
     label[for="automatSelect"],
@@ -100,7 +97,6 @@
       color: #455a64;
     }
 
-    /* Andere Labels normal 24px */
     label:not([for="stadtSelect"]):not([for="centerSelect"]):not([for="automatSelect"]):not([for="datum"]):not([for="mitarbeiterSelect"]) {
       font-size: 24px;
       font-weight: 500;
@@ -157,13 +153,11 @@
       flex-shrink: 0;
     }
 
-    /* Absatz 2 task-label 20% kleiner: 51px -> 41px */
     .section:nth-of-type(2) .task-label {
       flex: 1;
       font-size: 41px;
     }
 
-    /* Andere task-label behalten 51px */
     .task-label:not(.section:nth-of-type(2) .task-label) {
       flex: 1;
       font-size: 51px;
@@ -286,7 +280,7 @@
 
     <div class="section">
       <div class="section-header">
-        <div class="section-title">3. Bestände pro Tütte im Automaten </div>
+        <div class="section-title">3. Bestände pro Packung</div>
         <div class="section-badge">Füllstände</div>
       </div>
       <div class="stock-grid">
@@ -313,6 +307,10 @@
         <div class="stock-field" id="feld_gruen">
           <label for="zucker_gruen">Grün</label>
           <input type="number" id="zucker_gruen" step="0.5" min="0" max="10">
+        </div>
+        <div class="stock-field">
+          <label for="staebe">Stäbe</label>
+          <input type="number" id="staebe" step="1" min="0" max="100">
         </div>
       </div>
     </div>
@@ -540,7 +538,8 @@
           zucker_weiss: parseFloat(document.getElementById('zucker_weiss').value) || 0,
           zucker_weinrot: parseFloat(document.getElementById('zucker_weinrot').value) || 0,
           zucker_gruen: parseFloat(document.getElementById('zucker_gruen').value) || 0,
-          befeuchtungstest: document.getElementById('befuchtung').checked,
+          staebe: parseInt(document.getElementById('staebe').value) || 0,
+          befeuchtungstest: document.getElementById('befeuchtung').checked,
           reinigungstest: document.getElementById('reinigungstest').checked,
           stabgenommen: document.getElementById('stabgenommen').checked,
           roboterwinkel: document.getElementById('roboterwinkel').checked,
@@ -569,4 +568,5 @@
   </script>
 </body>
 </html>
+
 
