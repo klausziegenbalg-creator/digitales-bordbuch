@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Reinigungsprotokoll Automaten</title>
+  <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
 
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
@@ -23,11 +23,11 @@
 
     body {
       margin: 0;
-      padding: 20px 14px 44px;
+      padding: 20px 10px 46px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 22px;
+      font-size: 34px;          /* noch größer für Handy */
     }
 
     .page {
@@ -36,16 +36,16 @@
     }
 
     h1 {
-      font-size: 52px;
-      margin: 4px 4px 14px;
+      font-size: 44px;
+      margin: 4px 4px 16px;
       color: var(--accent-strong);
     }
 
     .section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 16px 16px 18px;
-      margin: 12px 2px;
+      border-radius: 18px;
+      padding: 20px 20px 22px;
+      margin: 14px 4px;
       box-shadow: 0 2px 6px rgba(13, 71, 161, 0.10);
       border: 1px solid var(--accent-soft);
     }
@@ -54,18 +54,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
     }
 
     .section-title {
-      font-size: 26px;
+      font-size: 32px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 16px;
-      padding: 4px 11px;
+      font-size: 22px;
+      padding: 5px 14px;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent-strong);
@@ -74,33 +74,25 @@
     .field-group {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-top: 4px;
     }
 
     label {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
     }
 
-    select,
-    input[type="date"],
-    input[type="number"],
-    textarea {
+    select, input[type="date"], input[type="number"], textarea {
       width: 100%;
-      max-width: 100%;
-      padding: 14px 14px;
+      padding: 20px 22px;
       margin: 2px 0 0;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #cfd8dc;
-      font-size: 22px;
+      font-size: 30px;
       background: #fafafa;
-    }
-
-    input[type="date"] {
-      display: block;
     }
 
     select:disabled {
@@ -110,22 +102,22 @@
 
     textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 100px;
     }
 
     .task-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
+      gap: 12px;
+      margin-top: 8px;
     }
 
     .task-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 12px;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
       background: #fafafa;
       border: 1px solid #eceff1;
     }
@@ -135,8 +127,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 28px;
-      height: 28px;
+      width: 38px;
+      height: 38px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -144,14 +136,14 @@
 
     .task-label {
       flex: 1;
-      font-size: 22px;
+      font-size: 30px;
     }
 
     .stock-grid {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 6px;
+      gap: 14px;
+      margin-top: 10px;
     }
 
     .stock-field {
@@ -163,15 +155,15 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 12px;
       background: var(--accent);
       color: white;
-      padding: 16px 26px;
+      padding: 20px 38px;
       border: none;
       border-radius: 999px;
-      font-size: 30px;
+      font-size: 32px;
       cursor: pointer;
-      margin: 18px 4px 0;
+      margin: 20px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
@@ -186,8 +178,8 @@
     }
 
     #status {
-      margin: 10px 4px 0;
-      font-size: 18px;
+      margin: 16px 4px 0;
+      font-size: 24px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -202,90 +194,13 @@
         width: 48%;
       }
     }
-
-    /* 1. Automat auswählen: alles +30 % */
-    .section-auswahl .section-title {
-      font-size: 34px;
-    }
-    .section-auswahl .section-badge {
-      font-size: 20px;
-      padding: 5px 13px;
-    }
-    .section-auswahl label {
-      font-size: 26px;
-    }
-    .section-auswahl select,
-    .section-auswahl input[type="date"] {
-      font-size: 28px;
-      padding: 16px 16px;
-    }
-
-    /* 2. Aufgaben: +20 % */
-    .section-aufgaben .section-title {
-      font-size: 31px;
-    }
-    .section-aufgaben .section-badge {
-      font-size: 19px;
-      padding: 5px 13px;
-    }
-    .section-aufgaben .task-row {
-      gap: 12px;
-      padding: 14px 16px;
-    }
-    .section-aufgaben .task-row input[type="checkbox"] {
-      width: 32px;
-      height: 32px;
-    }
-    .section-aufgaben .task-label {
-      font-size: 26px;
-    }
-
-    /* 3. Bestände: +30 % */
-    .section-bestaende .section-title {
-      font-size: 34px;
-    }
-    .section-bestaende .section-badge {
-      font-size: 20px;
-      padding: 5px 13px;
-    }
-    .section-bestaende label {
-      font-size: 26px;
-    }
-    .section-bestaende input[type="number"] {
-      font-size: 28px;
-      padding: 16px 16px;
-    }
-
-    /* 4. Funktionsprüfung: +30 % */
-    .section-funktion .section-title {
-      font-size: 34px;
-    }
-    .section-funktion .section-badge {
-      font-size: 20px;
-      padding: 5px 13px;
-    }
-    .section-funktion .task-row {
-      gap: 12px;
-      padding: 14px 16px;
-    }
-    .section-funktion .task-label {
-      font-size: 28px;
-    }
-    .section-funktion label {
-      font-size: 24px;
-    }
-    .section-funktion textarea {
-      font-size: 24px;
-      padding: 14px 14px;
-    }
   </style>
 </head>
 <body>
   <div class="page">
-    <h1>🧹 Reinigungsprotokoll Automaten</h1>
+    <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
 
-    <!-- 1. Automat auswählen -->
-    <div class="section section-auswahl">
+    <div class="section">
       <div class="section-header">
         <div class="section-title">1. Automat auswählen</div>
         <div class="section-badge">Pflichtangaben</div>
@@ -293,15 +208,15 @@
       <div class="field-group">
         <div>
           <label for="stadtSelect">Stadt</label>
-          <select id="stadtSelect"><option value="">Wähle Stadt...</option></select>
+          <select id="stadtSelect"><option>Wähle Stadt...</option></select>
         </div>
         <div>
           <label for="centerSelect">Center</label>
-          <select id="centerSelect" disabled><option value="">Wähle Center...</option></select>
+          <select id="centerSelect" disabled><option>Wähle Center...</option></select>
         </div>
         <div>
           <label for="automatSelect">Automat</label>
-          <select id="automatSelect" disabled><option value="">Wähle Automat...</option></select>
+          <select id="automatSelect" disabled><option>Wähle Automat...</option></select>
         </div>
         <div>
           <label for="datum">Datum</label>
@@ -309,13 +224,12 @@
         </div>
         <div>
           <label for="mitarbeiterSelect">Mitarbeiter</label>
-          <select id="mitarbeiterSelect" disabled><option value="">Mitarbeiter wählen...</option></select>
+          <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
         </div>
       </div>
     </div>
 
-    <!-- 2. Aufgaben pro Automat -->
-    <div class="section section-aufgaben">
+    <div class="section">
       <div class="section-header">
         <div class="section-title">2. Aufgaben pro Automat</div>
         <div class="section-badge">Ankreuzen</div>
@@ -340,8 +254,7 @@
       </div>
     </div>
 
-    <!-- 3. Bestände -->
-    <div class="section section-bestaende">
+    <div class="section">
       <div class="section-header">
         <div class="section-title">3. Bestände (angefangen ≥ 50 % = 0,5)</div>
         <div class="section-badge">Füllstände</div>
@@ -374,8 +287,7 @@
       </div>
     </div>
 
-    <!-- 4. Funktionsprüfung -->
-    <div class="section section-funktion">
+    <div class="section">
       <div class="section-header">
         <div class="section-title">4. Funktionsprüfung</div>
         <div class="section-badge">Testläufe</div>
@@ -386,7 +298,7 @@
         <div class="task-row"><input type="checkbox" id="stabgenommen"><div class="task-label">Automat. neuen Stab genommen</div></div>
         <div class="task-row"><input type="checkbox" id="roboterwinkel"><div class="task-label">Roboterarm 90° Winkel</div></div>
       </div>
-      <div style="margin-top:10px;">
+      <div style="margin-top:12px;">
         <label for="auffaelligkeiten">Auffälligkeiten</label>
         <textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
       </div>
@@ -427,9 +339,7 @@
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
-    function clearSelect(select) {
-      while (select.firstChild) select.removeChild(select.firstChild);
-    }
+    function clearSelect(select) { select.innerHTML = ''; }
 
     function addOption(select, text, value) {
       const option = document.createElement('option');
@@ -444,10 +354,8 @@
       feldWeinrot.style.display = sichtbar ? "flex" : "none";
       feldGruen.style.display = sichtbar ? "flex" : "none";
       if (!sichtbar) {
-        const zw = document.getElementById('zucker_weinrot');
-        const zg = document.getElementById('zucker_gruen');
-        if (zw) zw.value = "";
-        if (zg) zg.value = "";
+        document.getElementById('zucker_weinrot').value = "";
+        document.getElementById('zucker_gruen').value = "";
       }
     }
 
@@ -455,39 +363,31 @@
       clearSelect(stadtSelect);
       addOption(stadtSelect, 'Wähle Stadt...', '');
 
-      try {
-        const snapshot = await db.collection('automaten').get();
-        if (snapshot.empty) {
-          statusDiv.textContent = 'Keine Automaten in Firestore gefunden.';
-          statusDiv.className = 'err';
-        }
+      const snapshot = await db.collection('automaten').get();
 
-        const staedteSet = new Set();
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          if (data.stadt) staedteSet.add(String(data.stadt).trim());
-        });
+      const staedteSet = new Set();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.stadt) staedteSet.add(String(data.stadt).trim());
+      });
 
-        Array.from(staedteSet).sort().forEach(stadt =>
-          addOption(stadtSelect, stadt, stadt)
-        );
+      Array.from(staedteSet).sort().forEach(stadt =>
+        addOption(stadtSelect, stadt, stadt)
+      );
 
-        stadtSelect.disabled = staedteSet.size === 0;
-        centerSelect.disabled = true;
-        automatSelect.disabled = true;
-        mitarbeiterSelect.disabled = true;
-        speichernBtn.disabled = true;
+      stadtSelect.disabled = false;
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      speichernBtn.disabled = true;
 
-        updateFarbfelderSichtbarkeit();
-      } catch (e) {
-        statusDiv.textContent = 'Fehler beim Laden der Städte: ' + e.message;
-        statusDiv.className = 'err';
-      }
+      updateFarbfelderSichtbarkeit();
     }
 
     async function ladeCenter(stadt) {
       clearSelect(centerSelect);
       addOption(centerSelect, 'Wähle Center...', '');
+
       centerSelect.disabled = true;
       automatSelect.disabled = true;
       mitarbeiterSelect.disabled = true;
@@ -508,6 +408,7 @@
       });
 
       if (centerSelect.options.length > 1) centerSelect.disabled = false;
+
       updateFarbfelderSichtbarkeit();
     }
 
@@ -622,7 +523,7 @@
         statusDiv.className = 'ok';
 
         document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '';
+        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '');
         document.getElementById('auffaelligkeiten').value = '';
         automatSelect.value = '';
         mitarbeiterSelect.value = '';
@@ -638,3 +539,4 @@
   </script>
 </body>
 </html>
+
