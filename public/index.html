@@ -27,7 +27,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 26px;
+      font-size: 22px;
     }
 
     .page {
@@ -91,11 +91,11 @@
     textarea {
       width: 100%;
       max-width: 100%;
-      padding: 16px 16px;
+      padding: 14px 14px;
       margin: 2px 0 0;
       border-radius: 10px;
       border: 1px solid #cfd8dc;
-      font-size: 26px;
+      font-size: 22px;
       background: #fafafa;
     }
 
@@ -135,8 +135,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -144,7 +144,7 @@
 
     .task-label {
       flex: 1;
-      font-size: 26px;
+      font-size: 22px;
     }
 
     .stock-grid {
@@ -166,16 +166,16 @@
       gap: 8px;
       background: var(--accent);
       color: white;
-      padding: 18px 30px;
+      padding: 16px 26px;
       border: none;
       border-radius: 999px;
-      font-size: 36px; /* +40 % */
+      font-size: 30px; /* ca. +40 % ggü. 22 */
       cursor: pointer;
       margin: 18px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 40px; }
+    button span.icon { font-size: 34px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -187,7 +187,7 @@
 
     #status {
       margin: 10px 4px 0;
-      font-size: 20px;
+      font-size: 18px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -203,95 +203,80 @@
       }
     }
 
-    /* 1. Automat auswählen: alles +30 % */
+    /* 1. Automat auswählen: alles +30 % gegenüber Grundwerten */
     .section-auswahl .section-title {
       font-size: 34px;
     }
-
     .section-auswahl .section-badge {
-      font-size: 21px;
+      font-size: 20px;
       padding: 5px 13px;
     }
-
     .section-auswahl label {
       font-size: 26px;
     }
-
     .section-auswahl select,
     .section-auswahl input[type="date"] {
-      font-size: 34px;
-      padding: 18px 18px;
+      font-size: 28px;
+      padding: 16px 16px;
     }
 
-    /* 2. Aufgaben: Überschrift +20 %, Inhalt +20 % */
+    /* 2. Aufgaben: Überschrift +20 %, Inhalte +20 % */
     .section-aufgaben .section-title {
-      font-size: 31px; /* 26px → +20 % */
+      font-size: 31px;
     }
-
     .section-aufgaben .section-badge {
       font-size: 19px;
       padding: 5px 13px;
     }
-
     .section-aufgaben .task-row {
       gap: 12px;
       padding: 14px 16px;
     }
-
     .section-aufgaben .task-row input[type="checkbox"] {
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
     }
-
     .section-aufgaben .task-label {
-      font-size: 31px; /* ~+20 % auf 26 */
+      font-size: 26px; /* 22 → ~+20 % */
     }
 
     /* 3. Bestände: +30 % */
     .section-bestaende .section-title {
       font-size: 34px;
     }
-
     .section-bestaende .section-badge {
-      font-size: 21px;
+      font-size: 20px;
       padding: 5px 13px;
     }
-
     .section-bestaende label {
       font-size: 26px;
     }
-
     .section-bestaende input[type="number"] {
-      font-size: 34px;
-      padding: 18px 18px;
+      font-size: 28px;
+      padding: 16px 16px;
     }
 
     /* 4. Funktionsprüfung: +30 % */
     .section-funktion .section-title {
       font-size: 34px;
     }
-
     .section-funktion .section-badge {
-      font-size: 21px;
+      font-size: 20px;
       padding: 5px 13px;
     }
-
     .section-funktion .task-row {
       gap: 12px;
       padding: 14px 16px;
     }
-
     .section-funktion .task-label {
-      font-size: 34px;
+      font-size: 28px;
     }
-
     .section-funktion label {
-      font-size: 30px;
+      font-size: 24px;
     }
-
     .section-funktion textarea {
-      font-size: 30px;
-      padding: 16px 16px;
+      font-size: 24px;
+      padding: 14px 14px;
     }
   </style>
 </head>
@@ -308,15 +293,15 @@
       <div class="field-group">
         <div>
           <label for="stadtSelect">Stadt</label>
-          <select id="stadtSelect"><option>Wähle Stadt...</option></select>
+          <select id="stadtSelect"><option value="">Wähle Stadt...</option></select>
         </div>
         <div>
           <label for="centerSelect">Center</label>
-          <select id="centerSelect" disabled><option>Wähle Center...</option></select>
+          <select id="centerSelect" disabled><option value="">Wähle Center...</option></select>
         </div>
         <div>
           <label for="automatSelect">Automat</label>
-          <select id="automatSelect" disabled><option>Wähle Automat...</option></select>
+          <select id="automatSelect" disabled><option value="">Wähle Automat...</option></select>
         </div>
         <div>
           <label for="datum">Datum</label>
@@ -324,7 +309,7 @@
         </div>
         <div>
           <label for="mitarbeiterSelect">Mitarbeiter</label>
-          <select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select>
+          <select id="mitarbeiterSelect" disabled><option value="">Mitarbeiter wählen...</option></select>
         </div>
       </div>
     </div>
@@ -442,7 +427,9 @@
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
-    function clearSelect(select) { select.innerHTML = ''; }
+    function clearSelect(select) {
+      while (select.firstChild) select.removeChild(select.firstChild);
+    }
 
     function addOption(select, text, value) {
       const option = document.createElement('option');
@@ -626,7 +613,7 @@
         statusDiv.className = 'ok';
 
         document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[type=number]').forEach nb => nb.value = '';
+        document.querySelectorAll('input[type=number]').forEach(nb => nb.value = '';
         document.getElementById('auffaelligkeiten').value = '';
         automatSelect.value = '';
         mitarbeiterSelect.value = '';
@@ -642,6 +629,7 @@
   </script>
 </body>
 </html>
+
 
 
 
