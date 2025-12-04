@@ -169,7 +169,7 @@
       padding: 16px 26px;
       border: none;
       border-radius: 999px;
-      font-size: 30px; /* ca. +40 % ggü. 22 */
+      font-size: 30px;
       cursor: pointer;
       margin: 18px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
@@ -203,7 +203,7 @@
       }
     }
 
-    /* 1. Automat auswählen: alles +30 % gegenüber Grundwerten */
+    /* 1. Automat auswählen: alles +30 % */
     .section-auswahl .section-title {
       font-size: 34px;
     }
@@ -220,7 +220,7 @@
       padding: 16px 16px;
     }
 
-    /* 2. Aufgaben: Überschrift +20 %, Inhalte +20 % */
+    /* 2. Aufgaben: +20 % */
     .section-aufgaben .section-title {
       font-size: 31px;
     }
@@ -237,7 +237,7 @@
       height: 32px;
     }
     .section-aufgaben .task-label {
-      font-size: 26px; /* 22 → ~+20 % */
+      font-size: 26px;
     }
 
     /* 3. Bestände: +30 % */
@@ -444,8 +444,10 @@
       feldWeinrot.style.display = sichtbar ? "flex" : "none";
       feldGruen.style.display = sichtbar ? "flex" : "none";
       if (!sichtbar) {
-        document.getElementById('zucker_weinrot').value = "";
-        document.getElementById('zucker_gruen').value = "";
+        const zw = document.getElementById('zucker_weinrot');
+        const zg = document.getElementById('zucker_gruen');
+        if (zw) zw.value = "";
+        if (zg) zg.value = "";
       }
     }
 
@@ -453,31 +455,39 @@
       clearSelect(stadtSelect);
       addOption(stadtSelect, 'Wähle Stadt...', '');
 
-      const snapshot = await db.collection('automaten').get();
+      try {
+        const snapshot = await db.collection('automaten').get();
+        if (snapshot.empty) {
+          statusDiv.textContent = 'Keine Automaten in Firestore gefunden.';
+          statusDiv.className = 'err';
+        }
 
-      const staedteSet = new Set();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.stadt) staedteSet.add(String(data.stadt).trim());
-      });
+        const staedteSet = new Set();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.stadt) staedteSet.add(String(data.stadt).trim());
+        });
 
-      Array.from(staedteSet).sort().forEach(stadt =>
-        addOption(stadtSelect, stadt, stadt)
-      );
+        Array.from(staedteSet).sort().forEach(stadt =>
+          addOption(stadtSelect, stadt, stadt)
+        );
 
-      stadtSelect.disabled = false;
-      centerSelect.disabled = true;
-      automatSelect.disabled = true;
-      mitarbeiterSelect.disabled = true;
-      speichernBtn.disabled = true;
+        stadtSelect.disabled = staedteSet.size === 0;
+        centerSelect.disabled = true;
+        automatSelect.disabled = true;
+        mitarbeiterSelect.disabled = true;
+        speichernBtn.disabled = true;
 
-      updateFarbfelderSichtbarkeit();
+        updateFarbfelderSichtbarkeit();
+      } catch (e) {
+        statusDiv.textContent = 'Fehler beim Laden der Städte: ' + e.message;
+        statusDiv.className = 'err';
+      }
     }
 
     async function ladeCenter(stadt) {
       clearSelect(centerSelect);
       addOption(centerSelect, 'Wähle Center...', '');
-
       centerSelect.disabled = true;
       automatSelect.disabled = true;
       mitarbeiterSelect.disabled = true;
@@ -498,7 +508,6 @@
       });
 
       if (centerSelect.options.length > 1) centerSelect.disabled = false;
-
       updateFarbfelderSichtbarkeit();
     }
 
@@ -629,7 +638,3 @@
   </script>
 </body>
 </html>
-
-
-
-
