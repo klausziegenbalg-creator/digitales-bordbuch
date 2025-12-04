@@ -57,8 +57,18 @@
       margin-bottom: 14px;
     }
 
-    .section-title {
-      font-size: 54px; /* 32px + 70% = 54px */
+    /* Abschnitt 1 & 2 Überschrift größe 54px (32px + 70%) */
+    .section:nth-of-type(1) .section-title,
+    .section:nth-of-type(2) .section-title {
+      font-size: 54px;
+      font-weight: 600;
+      color: var(--accent-strong);
+    }
+
+    /* Abschnitt 3 & 4 Überschrift 20% reduziert auf 43px */
+    .section:nth-of-type(3) .section-title,
+    .section:nth-of-type(4) .section-title {
+      font-size: 43px;
       font-weight: 600;
       color: var(--accent-strong);
     }
@@ -78,19 +88,19 @@
       margin-top: 4px;
     }
 
-    /* Erhöhte Schriftgröße um 60 % für die genannten Labels */
+    /* Schriftgröße Label für Stadt, Center, Automat, Datum, Mitarbeiter 38px (60% größer) */
     label[for="stadtSelect"],
     label[for="centerSelect"],
     label[for="automatSelect"],
     label[for="datum"],
     label[for="mitarbeiterSelect"] {
-      font-size: 38px; /* 24px + 60% = 38px */
+      font-size: 38px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
     }
 
-    /* Andere Labels behalten Originalgröße */
+    /* Andere Labels normal 24px */
     label:not([for="stadtSelect"]):not([for="centerSelect"]):not([for="automatSelect"]):not([for="datum"]):not([for="mitarbeiterSelect"]) {
       font-size: 24px;
       font-weight: 500;
@@ -147,16 +157,16 @@
       flex-shrink: 0;
     }
 
-    /* Absatz 2 (Aufgaben pro Automat) - 20% verkleinert: 51px -> 41px */
+    /* Absatz 2 task-label 20% kleiner: 51px -> 41px */
     .section:nth-of-type(2) .task-label {
       flex: 1;
-      font-size: 41px; /* 51px - 20% = 41px */
+      font-size: 41px;
     }
 
     /* Andere task-label behalten 51px */
     .task-label:not(.section:nth-of-type(2) .task-label) {
       flex: 1;
-      font-size: 51px; /* 30px + 70% = 51px */
+      font-size: 51px;
     }
 
     .stock-grid {
@@ -559,3 +569,4 @@
   </script>
 </body>
 </html>
+
