@@ -147,7 +147,14 @@
       flex-shrink: 0;
     }
 
-    .task-label {
+    /* Absatz 2 (Aufgaben pro Automat) - 20% verkleinert: 51px -> 41px */
+    .section:nth-of-type(2) .task-label {
+      flex: 1;
+      font-size: 41px; /* 51px - 20% = 41px */
+    }
+
+    /* Andere task-label behalten 51px */
+    .task-label:not(.section:nth-of-type(2) .task-label) {
       flex: 1;
       font-size: 51px; /* 30px + 70% = 51px */
     }
@@ -552,5 +559,3 @@
   </script>
 </body>
 </html>
-
-
