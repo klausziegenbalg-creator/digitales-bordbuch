@@ -79,11 +79,14 @@
     }
 
     label {
-      font-size: 24px;
-      font-weight: 500;
-      margin-bottom: 2px;
-      color: #455a64;
-    }
+  label[for="stadtSelect"],
+label[for="centerSelect"],
+label[for="automatSelect"],
+label[for="datum"],
+label[for="mitarbeiterSelect"] {
+  font-size: 38px; /* 24px + 60% = 38px */
+}
+
 
     select, input[type="date"], input[type="number"], textarea {
       width: 100%;
