@@ -78,15 +78,25 @@
       margin-top: 4px;
     }
 
-    label {
-  label[for="stadtSelect"],
-label[for="centerSelect"],
-label[for="automatSelect"],
-label[for="datum"],
-label[for="mitarbeiterSelect"] {
-  font-size: 38px; /* 24px + 60% = 38px */
-}
+    /* Erhöhte Schriftgröße um 60 % für die genannten Labels */
+    label[for="stadtSelect"],
+    label[for="centerSelect"],
+    label[for="automatSelect"],
+    label[for="datum"],
+    label[for="mitarbeiterSelect"] {
+      font-size: 38px; /* 24px + 60% = 38px */
+      font-weight: 500;
+      margin-bottom: 2px;
+      color: #455a64;
+    }
 
+    /* Andere Labels behalten Originalgröße */
+    label:not([for="stadtSelect"]):not([for="centerSelect"]):not([for="automatSelect"]):not([for="datum"]):not([for="mitarbeiterSelect"]) {
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      color: #455a64;
+    }
 
     select, input[type="date"], input[type="number"], textarea {
       width: 100%;
@@ -542,4 +552,5 @@ label[for="mitarbeiterSelect"] {
   </script>
 </body>
 </html>
+
 
