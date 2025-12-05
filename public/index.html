@@ -30,7 +30,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 34px;
+      font-size: 24px;
     }
 
     .page {
@@ -39,7 +39,7 @@
     }
 
     h1 {
-      font-size: 44px;
+      font-size: 31px;
       margin: 4px 4px 16px;
       color: var(--accent-strong);
     }
@@ -62,20 +62,20 @@
 
     .section:nth-of-type(1) .section-title,
     .section:nth-of-type(2) .section-title {
-      font-size: 38px;
+      font-size: 27px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section:nth-of-type(3) .section-title,
     .section:nth-of-type(4) .section-title {
-      font-size: 38px;
+      font-size: 27px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 22px;
+      font-size: 15px;
       padding: 5px 14px;
       border-radius: 999px;
       background: var(--accent-soft);
@@ -94,14 +94,14 @@
     label[for="automatSelect"],
     label[for="datum"],
     label[for="mitarbeiterSelect"] {
-      font-size: 38px;
+      font-size: 27px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
     }
 
     label:not([for="stadtSelect"]):not([for="centerSelect"]):not([for="automatSelect"]):not([for="datum"]):not([for="mitarbeiterSelect"]) {
-      font-size: 24px;
+      font-size: 17px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
@@ -109,11 +109,11 @@
 
     select, input[type="date"], input[type="number"], textarea {
       width: 100%;
-      padding: 20px 22px;
+      padding: 14px 15px;
       margin: 2px 0 0;
       border-radius: 12px;
       border: 1px solid #cfd8dc;
-      font-size: 30px;
+      font-size: 21px;
       background: #fafafa;
     }
 
@@ -124,7 +124,7 @@
 
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 70px;
     }
 
     .task-list {
@@ -138,10 +138,11 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 16px 18px;
+      padding: 12px 14px;
       border-radius: 14px;
       background: #fafafa;
-      border: 1px solid #eceff1;
+      border: 1px sol
+id #eceff1;
     }
 
     .task-row:nth-child(odd) {
@@ -149,8 +150,8 @@
     }
 
     .task-row input[type="checkbox"] {
-      width: 38px;
-      height: 38px;
+      width: 27px;
+      height: 27px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -158,12 +159,12 @@
 
     .section:nth-of-type(2) .task-label {
       flex: 1;
-      font-size: 41px;
+      font-size: 29px;
     }
 
     .task-label:not(.section:nth-of-type(2) .task-label) {
       flex: 1;
-      font-size: 51px;
+      font-size: 36px;
     }
 
     .stock-grid {
@@ -178,7 +179,6 @@
       flex-direction: column;
     }
 
-    /* Bestell-Buttons */
     .order-buttons {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -190,9 +190,9 @@
       background: var(--success);
       color: white;
       border: none;
-      padding: 18px 20px;
+      padding: 13px 14px;
       border-radius: 12px;
-      font-size: 28px;
+      font-size: 20px;
       cursor: pointer;
       box-shadow: 0 3px 6px rgba(76, 175, 80, 0.35);
       transition: all 0.3s ease;
@@ -210,7 +210,7 @@
     }
 
     .order-btn span.icon {
-      font-size: 36px;
+      font-size: 25px;
     }
 
     .order-btn.ordered {
@@ -230,9 +230,9 @@
       transform: translateX(-50%);
       background: rgba(255,255,255,0.95);
       color: var(--accent-strong);
-      font-size: 18px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 4px 12px;
+      padding: 3px 8px;
       border-radius: 20px;
       white-space: nowrap;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -246,16 +246,16 @@
       gap: 12px;
       background: var(--accent);
       color: white;
-      padding: 20px 38px;
+      padding: 14px 27px;
       border: none;
       border-radius: 999px;
-      font-size: 32px;
+      font-size: 22px;
       cursor: pointer;
       margin: 20px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 34px; }
+    button span.icon { font-size: 24px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -267,7 +267,7 @@
 
     #status {
       margin: 16px 4px 0;
-      font-size: 24px;
+      font-size: 17px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -275,10 +275,10 @@
 
     .log-entry {
       background: #e3f2fd;
-      padding: 12px 16px;
+      padding: 8px 11px;
       border-radius: 10px;
       margin: 8px 0;
-      font-size: 28px;
+      font-size: 20px;
       border-left: 4px solid var(--accent);
     }
 
@@ -293,18 +293,18 @@
     }
 
     @media (max-width: 600px) {
-      body { font-size: 28px; }
+      body { font-size: 19px; }
       .order-btn.ordered::after {
-        font-size: 16px;
+        font-size: 11px;
         bottom: -6px;
-        padding: 2px 8px;
+        padding: 2px 6px;
       }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <h1>🧹 Reinigungsprotokoll Automaten</h1>
+    <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
 
     <!-- 1. Automat auswählen -->
     <div class="section">
@@ -553,7 +553,6 @@
     mitarbeiterSelect.addEventListener('change', pruefeFormular);
     datumInput.addEventListener('change', pruefeFormular);
 
-    // Button-Status setzen/entfernen
     function setButtonState(id, ordered) {
       const btn = document.getElementById(id);
       if (!btn) return;
@@ -564,7 +563,6 @@
       }
     }
 
-    // Bestellungen laden und Buttons einfärben (nur status = 'bestellt')
     function ladeBestellungen() {
       if (unsubscribeBestellungen) {
         unsubscribeBestellungen();
@@ -601,7 +599,6 @@
       });
     }
 
-    // Toggle Zucker-Bestellung (bestellt ↔ storniert)
     window.toggleBestellung = async function (sorte) {
       const btnId = 'btn-' + sorte;
       const btn = document.getElementById(btnId);
@@ -638,7 +635,6 @@
       }
     };
 
-    // Toggle Stäbe-Bestellung
     window.toggleStaebe = async function () {
       const btnId = 'btn-staebe';
       const btn = document.getElementById(btnId);
@@ -740,6 +736,7 @@
   </script>
 </body>
 </html>
+
 
 
 
