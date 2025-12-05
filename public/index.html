@@ -30,7 +30,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
       color: var(--text-main);
-      font-size: 24px;
+      font-size: 18px;
     }
 
     .page {
@@ -39,7 +39,7 @@
     }
 
     h1 {
-      font-size: 31px;
+      font-size: 20px;
       margin: 4px 4px 16px;
       color: var(--accent-strong);
     }
@@ -62,20 +62,20 @@
 
     .section:nth-of-type(1) .section-title,
     .section:nth-of-type(2) .section-title {
-      font-size: 27px;
+      font-size: 18px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section:nth-of-type(3) .section-title,
     .section:nth-of-type(4) .section-title {
-      font-size: 27px;
+      font-size: 18px;
       font-weight: 600;
       color: var(--accent-strong);
     }
 
     .section-badge {
-      font-size: 15px;
+      font-size: 14px;
       padding: 5px 14px;
       border-radius: 999px;
       background: var(--accent-soft);
@@ -94,14 +94,14 @@
     label[for="automatSelect"],
     label[for="datum"],
     label[for="mitarbeiterSelect"] {
-      font-size: 27px;
+      font-size: 18px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
     }
 
     label:not([for="stadtSelect"]):not([for="centerSelect"]):not([for="automatSelect"]):not([for="datum"]):not([for="mitarbeiterSelect"]) {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 500;
       margin-bottom: 2px;
       color: #455a64;
@@ -113,7 +113,7 @@
       margin: 2px 0 0;
       border-radius: 12px;
       border: 1px solid #cfd8dc;
-      font-size: 21px;
+      font-size: 16px;
       background: #fafafa;
     }
 
@@ -141,8 +141,7 @@
       padding: 12px 14px;
       border-radius: 14px;
       background: #fafafa;
-      border: 1px sol
-id #eceff1;
+      border: 1px solid #eceff1;  /* Fehler behoben */
     }
 
     .task-row:nth-child(odd) {
@@ -150,8 +149,8 @@ id #eceff1;
     }
 
     .task-row input[type="checkbox"] {
-      width: 27px;
-      height: 27px;
+      width: 18px;
+      height: 18px;
       margin: 0;
       accent-color: var(--accent);
       flex-shrink: 0;
@@ -159,12 +158,13 @@ id #eceff1;
 
     .section:nth-of-type(2) .task-label {
       flex: 1;
-      font-size: 29px;
+      font-size: 18px;
     }
 
-    .task-label:not(.section:nth-of-type(2) .task-label) {
+    /* Vereinfacht, um Selektor-/Klammerfehler zu vermeiden */
+    .task-label {
       flex: 1;
-      font-size: 36px;
+      font-size: 18px;
     }
 
     .stock-grid {
@@ -192,7 +192,7 @@ id #eceff1;
       border: none;
       padding: 13px 14px;
       border-radius: 12px;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       box-shadow: 0 3px 6px rgba(76, 175, 80, 0.35);
       transition: all 0.3s ease;
@@ -210,7 +210,7 @@ id #eceff1;
     }
 
     .order-btn span.icon {
-      font-size: 25px;
+      font-size: 20px;
     }
 
     .order-btn.ordered {
@@ -249,13 +249,13 @@ id #eceff1;
       padding: 14px 27px;
       border: none;
       border-radius: 999px;
-      font-size: 22px;
+      font-size: 18px;
       cursor: pointer;
       margin: 20px 4px 0;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.35);
     }
 
-    button span.icon { font-size: 24px; }
+    button span.icon { font-size: 20px; }
 
     button:hover:not(:disabled) { background: #1565c0; }
 
@@ -267,7 +267,7 @@ id #eceff1;
 
     #status {
       margin: 16px 4px 0;
-      font-size: 17px;
+      font-size: 16px;
     }
 
     #status.ok { color: var(--accent-strong); }
@@ -278,7 +278,7 @@ id #eceff1;
       padding: 8px 11px;
       border-radius: 10px;
       margin: 8px 0;
-      font-size: 20px;
+      font-size: 16px;
       border-left: 4px solid var(--accent);
     }
 
@@ -293,12 +293,25 @@ id #eceff1;
     }
 
     @media (max-width: 600px) {
-      body { font-size: 19px; }
+      body { font-size: 16px; }
+      h1 { font-size: 18px; }
+      .section .section-title { font-size: 18px; }
+      .order-btn { font-size: 16px; }
+      .order-btn span.icon { font-size: 18px; }
       .order-btn.ordered::after {
         font-size: 11px;
         bottom: -6px;
         padding: 2px 6px;
       }
+      select, input[type="date"], input[type="number"], textarea {
+        font-size: 16px;
+      }
+      label { font-size: 16px; }
+      .task-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+      }
+      .task-label { font-size: 16px; }
     }
   </style>
 </head>
@@ -409,6 +422,7 @@ id #eceff1;
     </button>
     <div id="status"></div>
   </div>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
@@ -736,6 +750,7 @@ id #eceff1;
   </script>
 </body>
 </html>
+
 
 
 
