@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reinigungsprotokoll Zuckerwatte Automaten</title>
+  <title>Reinigungsprotokollautomaten</title>
 
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
@@ -33,10 +33,7 @@
       font-size: 18px;
     }
 
-    .page {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+    .page { max-width: 900px; margin: 0 auto; }
 
     h1 {
       font-size: 20px;
@@ -60,15 +57,7 @@
       margin-bottom: 14px;
     }
 
-    .section:nth-of-type(1) .section-title,
-    .section:nth-of-type(2) .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--accent-strong);
-    }
-
-    .section:nth-of-type(3) .section-title,
-    .section:nth-of-type(4) .section-title {
+    .section .section-title {
       font-size: 18px;
       font-weight: 600;
       color: var(--accent-strong);
@@ -117,10 +106,7 @@
       background: #fafafa;
     }
 
-    select:disabled {
-      background: #eceff1;
-      color: #90a4ae;
-    }
+    select:disabled { background: #eceff1; color: #90a4ae; }
 
     textarea {
       resize: vertical;
@@ -141,12 +127,10 @@
       padding: 12px 14px;
       border-radius: 14px;
       background: #fafafa;
-      border: 1px solid #eceff1;  /* Fehler behoben */
+      border: 1px solid #eceff1;
     }
 
-    .task-row:nth-child(odd) {
-      background: #fdfbff;
-    }
+    .task-row:nth-child(odd) { background: #fdfbff; }
 
     .task-row input[type="checkbox"] {
       width: 18px;
@@ -156,16 +140,7 @@
       flex-shrink: 0;
     }
 
-    .section:nth-of-type(2) .task-label {
-      flex: 1;
-      font-size: 18px;
-    }
-
-    /* Vereinfacht, um Selektor-/Klammerfehler zu vermeiden */
-    .task-label {
-      flex: 1;
-      font-size: 18px;
-    }
+    .task-label { flex: 1; font-size: 18px; }
 
     .stock-grid {
       display: flex;
@@ -174,10 +149,7 @@
       margin-top: 10px;
     }
 
-    .stock-field {
-      display: flex;
-      flex-direction: column;
-    }
+    .stock-field { display: flex; flex-direction: column; }
 
     .order-buttons {
       display: grid;
@@ -204,23 +176,16 @@
       position: relative;
     }
 
-    .order-btn:hover:not(.ordered) {
-      background: #43a047;
-      transform: translateY(-1px);
-    }
+    .order-btn:hover:not(.ordered) { background: #43a047; transform: translateY(-1px); }
 
-    .order-btn span.icon {
-      font-size: 20px;
-    }
+    .order-btn span.icon { font-size: 20px; }
 
     .order-btn.ordered {
       background: var(--accent) !important;
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.4);
     }
 
-    .order-btn.ordered:hover {
-      transform: none;
-    }
+    .order-btn.ordered:hover { transform: none; }
 
     .order-btn.ordered::after {
       content: 'Bestellt';
@@ -256,20 +221,10 @@
     }
 
     button span.icon { font-size: 20px; }
-
     button:hover:not(:disabled) { background: #1565c0; }
+    button:disabled { background: #b0bec5; box-shadow: none; cursor: not-allowed; }
 
-    button:disabled {
-      background: #b0bec5;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    #status {
-      margin: 16px 4px 0;
-      font-size: 16px;
-    }
-
+    #status { margin: 16px 4px 0; font-size: 16px; }
     #status.ok { color: var(--accent-strong); }
     #status.err { color: var(--danger); }
 
@@ -283,13 +238,8 @@
     }
 
     @media (min-width: 700px) {
-      .stock-grid {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-      .stock-field {
-        width: 48%;
-      }
+      .stock-grid { flex-direction: row; flex-wrap: wrap; }
+      .stock-field { width: 48%; }
     }
 
     @media (max-width: 600px) {
@@ -298,28 +248,23 @@
       .section .section-title { font-size: 18px; }
       .order-btn { font-size: 16px; }
       .order-btn span.icon { font-size: 18px; }
-      .order-btn.ordered::after {
-        font-size: 11px;
-        bottom: -6px;
-        padding: 2px 6px;
-      }
-      select, input[type="date"], input[type="number"], textarea {
-        font-size: 16px;
-      }
+      .order-btn.ordered::after { font-size: 11px; bottom: -6px; padding: 2px 6px; }
+      select, input[type="date"], input[type="number"], textarea { font-size: 16px; }
       label { font-size: 16px; }
-      .task-row input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-      }
+      .task-row input[type="checkbox"] { width: 16px; height: 16px; }
       .task-label { font-size: 16px; }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <h1>🧹 Reinigungsprotokoll Zuckerwatte Automaten</h1>
+    <h1>
+  Reinigungsprotokoll Automaten<br>
+  <span style="font-size:16px; font-weight:500;">
+    Automatenservice Schiemann &amp; Automatenservice Albrecht
+  </span>
+</h1>
 
-    <!-- 1. Automat auswählen -->
     <div class="section">
       <div class="section-header">
         <div class="section-title">1. Automat auswählen</div>
@@ -330,11 +275,10 @@
         <div><label for="centerSelect">Center</label><select id="centerSelect" disabled><option>Wähle Center...</option></select></div>
         <div><label for="automatSelect">Automat</label><select id="automatSelect" disabled><option>Wähle Automat...</option></select></div>
         <div><label for="datum">Datum</label><input type="date" id="datum" /></div>
-        <div><label for="mitarbeiterSelect">Mitarbeiter</label><select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select></div>
+        <div><label for="mitarbeiterSelect">Mitarbeiter / Leitung</label><select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select></div>
       </div>
     </div>
 
-    <!-- 2. Aufgaben -->
     <div class="section">
       <div class="section-header">
         <div class="section-title">2. Aufgaben pro Automat</div>
@@ -360,7 +304,6 @@
       </div>
     </div>
 
-    <!-- 3. Bestände -->
     <div class="section">
       <div class="section-header">
         <div class="section-title">3. Bestände pro Packung</div>
@@ -377,7 +320,6 @@
       </div>
     </div>
 
-    <!-- 3.5 Bestellungen -->
     <div class="section">
       <div class="section-header">
         <div class="section-title">3.5 Bestellungen</div>
@@ -395,7 +337,6 @@
       <div id="bestell-logs"></div>
     </div>
 
-    <!-- 4. Funktionsprüfung -->
     <div class="section">
       <div class="section-header">
         <div class="section-title">4. Funktionsprüfung</div>
@@ -466,6 +407,17 @@
       const sichtbar = center === "Phönix";
       feldWeinrot.style.display = sichtbar ? "flex" : "none";
       feldGruen.style.display = sichtbar ? "flex" : "none";
+
+      const apfelBtn = document.getElementById('btn-apfel');
+      const kirschBtn = document.getElementById('btn-kirsch');
+      if (sichtbar) {
+        apfelBtn.style.display = '';
+        kirschBtn.style.display = '';
+      } else {
+        apfelBtn.style.display = 'none';
+        kirschBtn.style.display = 'none';
+      }
+
       if (!sichtbar) {
         document.getElementById('zucker_weinrot').value = "";
         document.getElementById('zucker_gruen').value = "";
@@ -488,6 +440,9 @@
       mitarbeiterSelect.disabled = true;
       speichernBtn.disabled = true;
       updateFarbfelderSichtbarkeit();
+
+      document.getElementById('btn-apfel').style.display = 'none';
+      document.getElementById('btn-kirsch').style.display = 'none';
     }
 
     async function ladeCenter(stadt) {
@@ -526,14 +481,25 @@
         .where('stadt', '==', stadt)
         .where('center', '==', center)
         .get();
+
       const mitarbeiterSet = new Set();
+
       snapshot.forEach(doc => {
         const data = doc.data();
         const code = (data.automatCode || data.Automat || "").toString().trim();
         if (code) addOption(automatSelect, code, code);
+
         if (data.mitarbeiter) mitarbeiterSet.add(String(data.mitarbeiter).trim());
+        if (data.leitung) mitarbeiterSet.add(String(data.leitung).trim());
       });
-      Array.from(mitarbeiterSet).sort().forEach(m => addOption(mitarbeiterSelect, m, m));
+
+      mitarbeiterSet.add('Klaus Schiemann');
+      mitarbeiterSet.add('Dirk Albrecht');
+
+      Array.from(mitarbeiterSet).sort().forEach(m =>
+        addOption(mitarbeiterSelect, m, m)
+      );
+
       if (automatSelect.options.length > 1) automatSelect.disabled = false;
       if (mitarbeiterSelect.options.length > 1) mitarbeiterSelect.disabled = false;
       updateFarbfelderSichtbarkeit();
@@ -570,11 +536,8 @@
     function setButtonState(id, ordered) {
       const btn = document.getElementById(id);
       if (!btn) return;
-      if (ordered) {
-        btn.classList.add('ordered');
-      } else {
-        btn.classList.remove('ordered');
-      }
+      if (ordered) btn.classList.add('ordered');
+      else btn.classList.remove('ordered');
     }
 
     function ladeBestellungen() {
@@ -604,11 +567,8 @@
           log.innerHTML = `✅ ${data.farbe || data.typ} (${data.menge}) - ${data.timestamp?.toDate().toLocaleString('de-DE')}`;
           logs.appendChild(log);
 
-          if (data.farbe) {
-            setButtonState('btn-' + data.farbe, true);
-          } else if (data.typ === 'Stäbe') {
-            setButtonState('btn-staebe', true);
-          }
+          if (data.farbe) setButtonState('btn-' + data.farbe, true);
+          else if (data.typ === 'Stäbe') setButtonState('btn-staebe', true);
         });
       });
     }
@@ -625,10 +585,12 @@
           await db.collection('bestellungen').add({
             farbe: sorte,
             typ: 'Zucker',
-            menge: '5kg',
+            menge: '2 Tüten',
             status: 'bestellt',
             automat: automatSelect.value,
             stadt: stadtSelect.value,
+            center: centerSelect.value,
+            mitarbeiter: mitarbeiterSelect.value,
             timestamp: new Date()
           });
           setButtonState(btnId, true);
@@ -636,10 +598,12 @@
           await db.collection('bestellungen').add({
             farbe: sorte,
             typ: 'Zucker',
-            menge: '5kg',
+            menge: '2 Tüten',
             status: 'storniert',
             automat: automatSelect.value,
             stadt: stadtSelect.value,
+            center: centerSelect.value,
+            mitarbeiter: mitarbeiterSelect.value,
             timestamp: new Date()
           });
           setButtonState(btnId, false);
@@ -664,6 +628,8 @@
             status: 'bestellt',
             automat: automatSelect.value,
             stadt: stadtSelect.value,
+            center: centerSelect.value,
+            mitarbeiter: mitarbeiterSelect.value,
             timestamp: new Date()
           });
           setButtonState(btnId, true);
@@ -674,6 +640,8 @@
             status: 'storniert',
             automat: automatSelect.value,
             stadt: stadtSelect.value,
+            center: centerSelect.value,
+            mitarbeiter: mitarbeiterSelect.value,
             timestamp: new Date()
           });
           setButtonState(btnId, false);
@@ -731,14 +699,12 @@
         };
 
         await db.collection('reinigungen').add(data);
-        statusDiv.textContent = '✅ Protokoll gespeichert';
+        statusDiv.textContent = '✅ Erfolgreich gespeichert';
         statusDiv.className = 'ok';
 
-        document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[type=number], textarea').forEach(el => el.value = '');
-        automatSelect.value = '';
-        mitarbeiterSelect.value = '';
-        pruefeFormular();
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } catch (err) {
         statusDiv.textContent = '❌ Fehler beim Speichern: ' + err.message;
         statusDiv.className = 'err';
@@ -750,6 +716,7 @@
   </script>
 </body>
 </html>
+
 
 
 
