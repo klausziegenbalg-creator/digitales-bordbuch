@@ -322,7 +322,9 @@
     <div id="status"></div>
   </div>
 
-  <script>
+  
+    <script>
+    // --- Firebase Grundkonfiguration ---
     const firebaseConfig = {
       apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
       authDomain: "digitales-bordbuch.firebaseapp.com",
@@ -336,6 +338,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    // --- DOM-Referenzen ---
     const stadtSelect = document.getElementById('stadtSelect');
     const centerSelect = document.getElementById('centerSelect');
     const automatSelect = document.getElementById('automatSelect');
@@ -344,149 +347,410 @@
     const speichernBtn = document.getElementById('speichernBtn');
     const statusDiv = document.getElementById('status');
 
+    // Elemente für Wochenwartung (werden gleich per JS ergänzt)
+    let wochenButton;
+    let wochenTaskContainer;
+    let wochenStatusDiv;
+
     let unsubscribeBestellungen = null;
 
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
-    function clearSelect(sel){ sel.innerHTML=''; }
-    function addOption(sel,text,val){ const o=document.createElement('option');o.textContent=text;o.value=val;sel.appendChild(o); }
+    function clearSelect(sel) {
+      sel.innerHTML = '';
+    }
+    function addOption(sel, text, val) {
+      const o = document.createElement('option');
+      o.textContent = text;
+      o.value = val;
+      sel.appendChild(o);
+    }
 
-    async function ladeStaedte(){
-      clearSelect(stadtSelect); addOption(stadtSelect,'Wähle Stadt...','');
+    // --- 1. Daten für Auswahl laden (Automat / Stadt / Center / Mitarbeiter) ---
+
+    async function ladeStaedte() {
+      clearSelect(stadtSelect);
+      addOption(stadtSelect, 'Wähle Stadt...', '');
       const snap = await db.collection('automaten').get();
       const set = new Set();
-      snap.forEach(d => { if(d.data().stadt) set.add(String(d.data().stadt).trim()); });
-      Array.from(set).sort().forEach(s => addOption(stadtSelect,s,s));
-      stadtSelect.disabled=false; centerSelect.disabled=true; automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      pruefeFormular();
-    }
-
-    async function ladeCenter(stadt){
-      clearSelect(centerSelect); addOption(centerSelect,'Wähle Center...','');
-      centerSelect.disabled=true; automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      if(!stadt){ pruefeFormular(); return; }
-      const snap = await db.collection('automaten').where('stadt','==',stadt).get();
-      snap.forEach(doc => { const c=doc.data().center; if(c) addOption(centerSelect,String(c),String(c)); });
-      if(centerSelect.options.length>1) centerSelect.disabled=false;
-      pruefeFormular();
-    }
-
-    async function ladeAutomatenUndMitarbeiter(stadt,center){
-      clearSelect(automatSelect); addOption(automatSelect,'Wähle Automat...','');
-      clearSelect(mitarbeiterSelect); addOption(mitarbeiterSelect,'Mitarbeiter wählen...','');
-      automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      if(!stadt || !center){ pruefeFormular(); return; }
-      const snap = await db.collection('automaten').where('stadt','==',stadt).where('center','==',center).get();
-      const mitSet = new Set();
-      snap.forEach(doc=>{
-        const d=doc.data();
-        const code=(d.automatCode || d.Automat || '').toString().trim();
-        if(code) addOption(automatSelect,code,code);
-        if(d.mitarbeiter) mitSet.add(String(d.mitarbeiter).trim());
-        if(d.leitung) mitSet.add(String(d.leitung).trim());
+      snap.forEach(d => {
+        if (d.data().stadt) set.add(String(d.data().stadt).trim());
       });
+      Array.from(set).sort().forEach(s => addOption(stadtSelect, s, s));
+      stadtSelect.disabled = false;
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      pruefeFormular();
+    }
+
+    async function ladeCenter(stadt) {
+      clearSelect(centerSelect);
+      addOption(centerSelect, 'Wähle Center...', '');
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      if (!stadt) {
+        pruefeFormular();
+        return;
+      }
+      const snap = await db.collection('automaten').where('stadt', '==', stadt).get();
+      const set = new Set();
+      snap.forEach(doc => {
+        const c = doc.data().center;
+        if (c) set.add(String(c));
+      });
+      Array.from(set).sort().forEach(c => addOption(centerSelect, c, c));
+      if (centerSelect.options.length > 1) centerSelect.disabled = false;
+      pruefeFormular();
+    }
+
+    async function ladeAutomatenUndMitarbeiter(stadt, center) {
+      clearSelect(automatSelect);
+      addOption(automatSelect, 'Wähle Automat...', '');
+      clearSelect(mitarbeiterSelect);
+      addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      if (!stadt || !center) {
+        pruefeFormular();
+        return;
+      }
+      const snap = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .where('center', '==', center)
+        .get();
+
+      const mitSet = new Set();
+      snap.forEach(doc => {
+        const d = doc.data();
+        const code = (d.automatCode || d.Automat || '').toString().trim();
+        if (code) addOption(automatSelect, code, code);
+        if (d.mitarbeiter) mitSet.add(String(d.mitarbeiter).trim());
+        if (d.leitung) mitSet.add(String(d.leitung).trim());
+      });
+
       mitSet.add('Klaus Schiemann');
       mitSet.add('Dirk Albrecht');
-      Array.from(mitSet).sort().forEach(m=>addOption(mitarbeiterSelect,m,m));
-      if(automatSelect.options.length>1) automatSelect.disabled=false;
-      if(mitarbeiterSelect.options.length>1) mitarbeiterSelect.disabled=false;
+      Array.from(mitSet).sort().forEach(m => addOption(mitarbeiterSelect, m, m));
+
+      if (automatSelect.options.length > 1) automatSelect.disabled = false;
+      if (mitarbeiterSelect.options.length > 1) mitarbeiterSelect.disabled = false;
+
       pruefeFormular();
       ladeBestellungen();
+      ladeWochenwartung(); // Wochenwartung aktualisieren, wenn Automat gewechselt wird
     }
 
-    function pruefeFormular(){
-      const ok = stadtSelect.value && centerSelect.value && automatSelect.value && mitarbeiterSelect.value && datumInput.value;
+    function pruefeFormular() {
+      const ok =
+        stadtSelect.value &&
+        centerSelect.value &&
+        automatSelect.value &&
+        mitarbeiterSelect.value &&
+        datumInput.value;
       speichernBtn.disabled = !ok;
+      if (wochenButton) wochenButton.disabled = !ok;
     }
 
-    stadtSelect.addEventListener('change',()=>{ladeCenter(stadtSelect.value);});
-    centerSelect.addEventListener('change',()=>{ladeAutomatenUndMitarbeiter(stadtSelect.value,centerSelect.value);});
-    automatSelect.addEventListener('change',()=>{pruefeFormular();ladeBestellungen();});
-    mitarbeiterSelect.addEventListener('change',pruefeFormular);
-    datumInput.addEventListener('change',pruefeFormular);
+    stadtSelect.addEventListener('change', () => {
+      ladeCenter(stadtSelect.value);
+    });
+    centerSelect.addEventListener('change', () => {
+      ladeAutomatenUndMitarbeiter(stadtSelect.value, centerSelect.value);
+    });
+    automatSelect.addEventListener('change', () => {
+      pruefeFormular();
+      ladeBestellungen();
+      ladeWochenwartung();
+    });
+    mitarbeiterSelect.addEventListener('change', pruefeFormular);
+    datumInput.addEventListener('change', pruefeFormular);
 
-    function setButtonState(id,on){
-      const b=document.getElementById(id);
-      if(!b)return;
-      on?b.classList.add('ordered'):b.classList.remove('ordered');
+    // --- 2. Bestellungen (Zucker / Stäbe) ---
+
+    function setButtonState(id, on) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      on ? b.classList.add('ordered') : b.classList.remove('ordered');
     }
 
-    function ladeBestellungen(){
-      if(unsubscribeBestellungen){unsubscribeBestellungen();unsubscribeBestellungen=null;}
-      document.querySelectorAll('.order-btn').forEach(b=>b.classList.remove('ordered'));
+    function ladeBestellungen() {
+      if (unsubscribeBestellungen) {
+        unsubscribeBestellungen();
+        unsubscribeBestellungen = null;
+      }
+      document.querySelectorAll('.order-btn').forEach(b =>
+        b.classList.remove('ordered')
+      );
       const code = automatSelect.value || '';
-      if(!code) return;
-      const q = db.collection('bestellungen')
-        .where('automat','==',code)
-        .where('status','==','bestellt')
-        .orderBy('timestamp','desc');
-      unsubscribeBestellungen = q.onSnapshot(snap=>{
-        snap.forEach(doc=>{
-          const d=doc.data();
-          if(d.farbe) setButtonState('btn-'+d.farbe,true);
-          else if(d.typ==='Stäbe') setButtonState('btn-staebe',true);
+      if (!code) return;
+      const q = db
+        .collection('bestellungen')
+        .where('automat', '==', code)
+        .where('status', '==', 'bestellt')
+        .orderBy('timestamp', 'desc');
+      unsubscribeBestellungen = q.onSnapshot(snap => {
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.farbe) setButtonState('btn-' + d.farbe, true);
+          else if (d.typ === 'Stäbe') setButtonState('btn-staebe', true);
         });
       });
     }
 
-    window.toggleBestellung = async function(sorte){
-      const btnId='btn-'+sorte;
-      const btn=document.getElementById(btnId);
-      if(!btn || !automatSelect.value) return;
+    window.toggleBestellung = async function (sorte) {
+      const btnId = 'btn-' + sorte;
+      const btn = document.getElementById(btnId);
+      if (!btn || !automatSelect.value) return;
       const istBestellt = btn.classList.contains('ordered');
-      try{
+      try {
         const basis = {
-          farbe:sorte,
-          typ:'Zucker',
-          menge:'2 Tüten',
-          automat:automatSelect.value,
-          stadt:stadtSelect.value,
-          center:centerSelect.value,
-          mitarbeiter:mitarbeiterSelect.value,
-          timestamp:new Date()
+          farbe: sorte,
+          typ: 'Zucker',
+          menge: '2 Tüten',
+          automat: automatSelect.value,
+          stadt: stadtSelect.value,
+          center: centerSelect.value,
+          mitarbeiter: mitarbeiterSelect.value,
+          timestamp: new Date()
         };
-        if(!istBestellt){
-          await db.collection('bestellungen').add({...basis,status:'bestellt'});
-          setButtonState(btnId,true);
-        }else{
-          await db.collection('bestellungen').add({...basis,status:'storniert'});
-          setButtonState(btnId,false);
+        if (!istBestellt) {
+          await db.collection('bestellungen').add({ ...basis, status: 'bestellt' });
+          setButtonState(btnId, true);
+        } else {
+          await db
+            .collection('bestellungen')
+            .add({ ...basis, status: 'storniert' });
+          setButtonState(btnId, false);
         }
-      }catch(e){console.error(e);}
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    window.toggleStaebe = async function(){
-      const btnId='btn-staebe';
-      const btn=document.getElementById(btnId);
-      if(!btn || !automatSelect.value) return;
+    window.toggleStaebe = async function () {
+      const btnId = 'btn-staebe';
+      const btn = document.getElementById(btnId);
+      if (!btn || !automatSelect.value) return;
       const istBestellt = btn.classList.contains('ordered');
-      try{
+      try {
         const basis = {
-          typ:'Stäbe',
-          menge:'2 Pakete',
-          automat:automatSelect.value,
-          stadt:stadtSelect.value,
-          center:centerSelect.value,
-          mitarbeiter:mitarbeiterSelect.value,
-          timestamp:new Date()
+          typ: 'Stäbe',
+          menge: '2 Pakete',
+          automat: automatSelect.value,
+          stadt: stadtSelect.value,
+          center: centerSelect.value,
+          mitarbeiter: mitarbeiterSelect.value,
+          timestamp: new Date()
         };
-        if(!istBestellt){
-          await db.collection('bestellungen').add({...basis,status:'bestellt',staebeBestellt:2});
-          setButtonState(btnId,true);
-        }else{
-          await db.collection('bestellungen').add({...basis,status:'storniert',staebeBestellt:-2});
-          setButtonState(btnId,false);
+        if (!istBestellt) {
+          await db
+            .collection('bestellungen')
+            .add({ ...basis, status: 'bestellt', staebeBestellt: 2 });
+          setButtonState(btnId, true);
+        } else {
+          await db
+            .collection('bestellungen')
+            .add({ ...basis, status: 'storniert', staebeBestellt: -2 });
+          setButtonState(btnId, false);
         }
-      }catch(e){console.error(e);}
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    async function speichernProtokoll(){
-      if(speichernBtn.disabled) return;
-      speichernBtn.disabled=true;
-      statusDiv.textContent='Speichere…';
-      statusDiv.className='';
-      try{
+    // --- 3. Wochenwartung (dynamisch aus Wartungselemente / Wochenstatus) ---
+
+    // Hilfsfunktion: aktuelle Kalenderwoche grob als "YYYY-WW"
+    function getCurrentWeekKey() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const oneJan = new Date(year, 0, 1);
+      const dayOfYear = Math.floor((d - oneJan) / 86400000) + 1;
+      const week = Math.ceil(dayOfYear / 7);
+      return `${year}-W${week.toString().padStart(2, '0')}`;
+    }
+
+    // Wartungs-Section im DOM nachträglich einfügen
+    function initWochenwartungUI() {
+      const page = document.querySelector('.page');
+      if (!page) return;
+      // neue Section nach „4. Funktionsprüfung“ einfügen
+      const sections = document.querySelectorAll('.section');
+      const lastSection = sections[sections.length - 1];
+
+      const section = document.createElement('div');
+      section.className = 'section';
+      section.innerHTML = `
+        <div class="section-header">
+          <div class="section-title">5. Wöchentliche Wartung</div>
+          <div class="section-badge">7‑Tage‑Zeitraum</div>
+        </div>
+        <div class="field-group">
+          <button class="main" id="wochenwartungBtn" disabled>🛠️ Wöchentliche Wartung öffnen</button>
+          <div id="wochenwartungStatus" style="font-size:16px; margin-top:8px;"></div>
+          <div id="wochenwartungTasks" class="task-list" style="margin-top:8px;"></div>
+        </div>
+      `;
+      lastSection.after(section);
+
+      wochenButton = document.getElementById('wochenwartungBtn');
+      wochenTaskContainer = document.getElementById('wochenwartungTasks');
+      wochenStatusDiv = document.getElementById('wochenwartungStatus');
+
+      if (wochenButton) {
+        wochenButton.addEventListener('click', () => {
+          ladeWochenwartung(true);
+        });
+      }
+
+      pruefeFormular();
+    }
+
+    // Wochenwartung laden: wenn openDialog == true, Aufgaben anzeigen,
+    // sonst nur Status/Hinweis (Freitag).
+    async function ladeWochenwartung(openDialog = false) {
+      if (!automatSelect.value || !mitarbeiterSelect.value) {
+        if (wochenStatusDiv) wochenStatusDiv.textContent = '';
+        if (wochenTaskContainer) wochenTaskContainer.innerHTML = '';
+        return;
+      }
+
+      const weekKey = getCurrentWeekKey();
+      const automatCode = automatSelect.value;
+
+      // vorhandenes Wochen-Dokument suchen
+      const q = await db
+        .collection('wochenWartung')
+        .where('automatCode', '==', automatCode)
+        .where('woche', '==', weekKey)
+        .limit(1)
+        .get();
+
+      let docRef = null;
+      let docData = null;
+
+      if (!q.empty) {
+        docRef = q.docs[0].ref;
+        docData = q.docs[0].data();
+      } else {
+        // noch nichts vorhanden – erst beim Öffnen des Dialogs anlegen
+      }
+
+      // einfache Freitagsprüfung für Hinweis
+      const today = new Date();
+      const isFriday = today.getDay() === 5; // 5 = Freitag
+      if (wochenStatusDiv) {
+        if (docData && docData.status === 'erledigt') {
+          wochenStatusDiv.textContent = 'Wöchentliche Wartung: erledigt.';
+        } else if (isFriday) {
+          wochenStatusDiv.textContent =
+            'Hinweis: Morgen ist letzter Tag für die Wochenwartung.';
+        } else {
+          wochenStatusDiv.textContent = '';
+        }
+      }
+
+      if (!openDialog) return;
+
+      // Dialog-Ansicht: Wartungselemente (typ = "Wochenwartung") laden
+      const elementsSnap = await db
+        .collection('Wartungselemente')
+        .where('typ', '==', 'Wochenwartung')
+        .get();
+
+      const taskMap = (docData && docData.tasks) || {};
+      if (wochenTaskContainer) {
+        wochenTaskContainer.innerHTML = '';
+      }
+
+      const tasks = [];
+
+      elementsSnap.forEach(elDoc => {
+        const d = elDoc.data();
+        const id = elDoc.id;
+        const label = d.bezeichnung || 'Wartung';
+        const key = 'ww_' + id;
+
+        const row = document.createElement('div');
+        row.className = 'task-row';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = key;
+        checkbox.checked = !!(taskMap[id] && taskMap[id].done);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'task-label';
+        lbl.textContent = label;
+
+        row.appendChild(checkbox);
+        row.appendChild(lbl);
+        wochenTaskContainer.appendChild(row);
+
+        tasks.push({ id, checkbox });
+      });
+
+      // Speichern-Button unter die Aufgaben setzen
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'main';
+      saveBtn.textContent = '✅ Wochenwartung speichern';
+      saveBtn.style.marginTop = '16px';
+
+      saveBtn.onclick = async () => {
+        // tasks -> Firestore-Struktur
+        const newTasks = {};
+        let allDone = true;
+        tasks.forEach(t => {
+          const done = t.checkbox.checked;
+          newTasks[t.id] = {
+            done,
+            doneAt: done ? new Date() : null
+          };
+          if (!done) allDone = false;
+        });
+
+        const newStatus = allDone ? 'erledigt' : 'teilweise';
+
+        if (!docRef) {
+          // neues Wochen-Dokument anlegen
+          const payload = {
+            automatCode,
+            woche: weekKey,
+            mitarbeiter: mitarbeiterSelect.value,
+            startedAt: new Date(),
+            tasks: newTasks,
+            status: newStatus
+          };
+          docRef = await db.collection('wochenWartung').add(payload);
+        } else {
+          await docRef.update({
+            tasks: newTasks,
+            status: newStatus
+          });
+        }
+
+        if (wochenStatusDiv) {
+          wochenStatusDiv.textContent =
+            newStatus === 'erledigt'
+              ? 'Wöchentliche Wartung: erledigt.'
+              : 'Wöchentliche Wartung: teilweise erledigt.';
+        }
+      };
+
+      wochenTaskContainer.appendChild(saveBtn);
+    }
+
+    // --- 4. Reinigungsprotokoll speichern (bestehende Logik) ---
+
+    async function speichernProtokoll() {
+      if (speichernBtn.disabled) return;
+      speichernBtn.disabled = true;
+      statusDiv.textContent = 'Speichere…';
+      statusDiv.className = '';
+      try {
         const data = {
           automatCode: automatSelect.value,
           stadt: stadtSelect.value,
@@ -494,7 +758,6 @@
           datum: new Date(datumInput.value),
           mitarbeiter: mitarbeiterSelect.value,
 
-          // Punkt 2 – Aufgaben
           zucker_aufgefuellt: document.getElementById('zucker').checked,
           wasser_aufgefuellt: document.getElementById('wasser').checked,
           staebe_aufgefuellt: document.getElementById('staebeAuf').checked,
@@ -512,47 +775,47 @@
           brennerkopf_gereinigt: document.getElementById('brennerkopf').checked,
           duese_gereinigt: document.getElementById('duese').checked,
 
-          // Punkt 3 – Bestände
-          zucker_rot:   parseFloat(document.getElementById('zucker_rot').value)   || 0,
-          zucker_gelb:  parseFloat(document.getElementById('zucker_gelb').value)  || 0,
-          zucker_blau:  parseFloat(document.getElementById('zucker_blau').value)  || 0,
+          zucker_rot: parseFloat(document.getElementById('zucker_rot').value) || 0,
+          zucker_gelb: parseFloat(document.getElementById('zucker_gelb').value) || 0,
+          zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
           zucker_weiss: parseFloat(document.getElementById('zucker_weiss').value) || 0,
-          zucker_weinrot:parseFloat(document.getElementById('zucker_weinrot').value)||0,
+          zucker_weinrot:
+            parseFloat(document.getElementById('zucker_weinrot').value) || 0,
           zucker_gruen: parseFloat(document.getElementById('zucker_gruen').value) || 0,
-          staebe:       parseFloat(document.getElementById('staebe').value)       || 0,
+          staebe: parseFloat(document.getElementById('staebe').value) || 0,
 
-          // Punkt 4 – Funktionsprüfung
-          befeuchtungstest:          document.getElementById('befeuchtung').checked,
-          reinigungstest:           document.getElementById('reinigungstest').checked,
-          neuer_stab_genommen:      document.getElementById('neuer_stab').checked,
-          roboterarm_90grad:        document.getElementById('roboterarm_90grad').checked,
-          kreditkartensystem_ok:    document.getElementById('kreditkarte_ok').checked,
-          geldschein_system_ok:     document.getElementById('geldschein_ok').checked,
-          material_im_system:       document.getElementById('material_eingetragen').checked,
+          befeuchtungstest: document.getElementById('befeuchtung').checked,
+          reinigungstest: document.getElementById('reinigungstest').checked,
+          neuer_stab_genommen: document.getElementById('neuer_stab').checked,
+          roboterarm_90grad: document.getElementById('roboterarm_90grad').checked,
+          kreditkartensystem_ok: document.getElementById('kreditkarte_ok').checked,
+          geldschein_system_ok: document.getElementById('geldschein_ok').checked,
+          material_im_system: document.getElementById('material_eingetragen').checked,
 
-          auffaelligkeiten: document.getElementById('auffaelligkeiten').value.trim(),
+          auffaelligkeiten: document
+            .getElementById('auffaelligkeiten')
+            .value.trim(),
           erstelltAm: new Date()
         };
 
         await db.collection('reinigungen').add(data);
-        statusDiv.textContent='✅ Erfolgreich gespeichert';
-        statusDiv.className='ok';
-        setTimeout(()=>window.location.reload(),2000);
-      }catch(err){
-        statusDiv.textContent='❌ Fehler beim Speichern: '+err.message;
-        statusDiv.className='err';
-        speichernBtn.disabled=false;
+        statusDiv.textContent = '✅ Erfolgreich gespeichert';
+        statusDiv.className = 'ok';
+        setTimeout(() => window.location.reload(), 2000);
+      } catch (err) {
+        statusDiv.textContent = '❌ Fehler beim Speichern: ' + err.message;
+        statusDiv.className = 'err';
+        speichernBtn.disabled = false;
       }
     }
 
+    // Exponiere speichernProtokoll für Button
+    window.speichernProtokoll = speichernProtokoll;
+
+    // Start: UI aufbauen
+    initWochenwartungUI();
     ladeStaedte();
   </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
