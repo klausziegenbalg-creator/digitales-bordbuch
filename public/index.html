@@ -58,7 +58,7 @@
     .section-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justifyContent: space-between;
       margin-bottom: 14px;
     }
 
@@ -256,7 +256,6 @@
         <div class="stock-field"><label for="zucker_gelb">Gelber Zucker</label><input type="number" id="zucker_gelb" step="0.5"></div>
         <div class="stock-field"><label for="zucker_blau">Blauer Zucker</label><input type="number" id="zucker_blau" step="0.5"></div>
         <div class="stock-field"><label for="zucker_weiss">Weißer Zucker</label><input type="number" id="zucker_weiss" step="0.5"></div>
-        <!-- Weinrot/Grün nur für CYJ1001014 -->
         <div class="stock-field" id="feld_weinrot" style="display:none;">
           <label for="zucker_weinrot">Weinrot</label>
           <input type="number" id="zucker_weinrot" step="0.5">
@@ -280,7 +279,6 @@
         <button class="order-btn" id="btn-vanille"  onclick="toggleBestellung('vanille')">🍭 Gelb (2 Tüten)</button>
         <button class="order-btn" id="btn-blaubeere"onclick="toggleBestellung('blaubeere')">🫐 Blau (2 Tüten)</button>
         <button class="order-btn" id="btn-normal"  onclick="toggleBestellung('normal')">🍭 Weiß (2 Tüten)</button>
-        <!-- Grün/Weinrot nur für CYJ1001014 -->
         <button class="order-btn" id="btn-apfel"   style="display:none;" onclick="toggleBestellung('apfel')">🍏 Grün (2 Tüten)</button>
         <button class="order-btn" id="btn-kirsch"  style="display:none;" onclick="toggleBestellung('kirsch')">🍒 Weinrot (2 Tüten)</button>
         <button class="order-btn" id="btn-staebe"  onclick="toggleStaebe()">🧊 Stäbe (2 Pakete)</button>
@@ -583,7 +581,7 @@
         : 'Wartung ausblenden';
     });
 
-    // --- Bestellungen ---
+    // Bestellungen
 
     function setButtonState(id, on) {
       const b = document.getElementById(id);
@@ -676,7 +674,7 @@
       }
     };
 
-    // --- Wochenwartung ---
+    // Wochenwartung
 
     function getCurrentWeekKey() {
       const d = new Date();
@@ -824,7 +822,7 @@
       wochenTaskContainer.appendChild(saveBtn);
     }
 
-    // --- Wartungselemente für Einzelwartung ---
+    // Wartungselemente für Einzelwartung (typ == "Checkheft")
 
     async function ladeWartungselemente() {
       if (!wartungsartSelect) return;
@@ -837,7 +835,7 @@
 
       const snap = await db
         .collection('Wartungselemente')
-        .where('typ', 'in', ['', 'Protokoll'])
+        .where('typ', '==', 'Checkheft')
         .get();
 
       const items = [];
@@ -924,7 +922,7 @@
 
     window.wartungEintragen = wartungEintragen;
 
-    // --- Reinigungsprotokoll speichern ---
+    // Reinigungsprotokoll speichern
 
     async function speichernProtokoll() {
       if (speichernBtn.disabled) return;
