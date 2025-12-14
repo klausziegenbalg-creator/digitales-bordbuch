@@ -58,7 +58,7 @@
     .section-header {
       display: flex;
       align-items: center;
-      justifyContent: space-between;
+      justify-content: space-between;
       margin-bottom: 14px;
     }
 
@@ -448,6 +448,12 @@
       sel.appendChild(o);
     }
 
+    // Code normalisieren (Bindestriche entfernen)
+    function normalizeCode(code) {
+      if (!code) return "";
+      return String(code).replace(/-/g, "").trim();
+    }
+
     async function ladeStaedte() {
       clearSelect(stadtSelect);
       addOption(stadtSelect, 'Wähle Stadt...', '');
@@ -535,7 +541,7 @@
     }
 
     function updateSonderZuckerFelder() {
-      const code = automatSelect.value || '';
+      const code = normalizeCode(automatSelect.value || '');
       const sichtbar = code === 'CYJ1001014';
       if (feldWeinrot) feldWeinrot.style.display = sichtbar ? 'flex' : 'none';
       if (feldGruen) feldGruen.style.display = sichtbar ? 'flex' : 'none';
@@ -564,7 +570,6 @@
     mitarbeiterSelect.addEventListener('change', pruefeFormular);
     datumInput.addEventListener('change', pruefeFormular);
 
-    // Toggle Sichtbarkeit Wartungsbereiche
     toggleWochenwartungBtn.addEventListener('click', () => {
       const sichtbar = wochenwartungSection.style.display === 'block';
       wochenwartungSection.style.display = sichtbar ? 'none' : 'block';
@@ -597,7 +602,7 @@
       document.querySelectorAll('.order-btn').forEach(b =>
         b.classList.remove('ordered')
       );
-      const code = automatSelect.value || '';
+      const code = normalizeCode(automatSelect.value || '');
       if (!code) return;
       const q = db
         .collection('bestellungen')
@@ -623,7 +628,7 @@
           farbe: sorte,
           typ: 'Zucker',
           menge: '2 Tüten',
-          automat: automatSelect.value,
+          automat: normalizeCode(automatSelect.value),
           stadt: stadtSelect.value,
           center: centerSelect.value,
           mitarbeiter: mitarbeiterSelect.value,
@@ -652,7 +657,7 @@
         const basis = {
           typ: 'Stäbe',
           menge: '2 Pakete',
-          automat: automatSelect.value,
+          automat: normalizeCode(automatSelect.value),
           stadt: stadtSelect.value,
           center: centerSelect.value,
           mitarbeiter: mitarbeiterSelect.value,
@@ -706,7 +711,7 @@
       }
 
       const weekKey = getCurrentWeekKey();
-      const automatCode = automatSelect.value;
+      const automatCode = normalizeCode(automatSelect.value);
 
       const q = await db
         .collection('wochenWartung')
@@ -859,7 +864,7 @@
     async function wartungEintragen() {
       if (!wartungSpeichernBtn || wartungSpeichernBtn.disabled) return;
 
-      const automatCode = automatSelect.value;
+      const automatCode = normalizeCode(automatSelect.value);
       const mitarbeiter = mitarbeiterSelect.value;
       const datumStr = datumInput.value;
 
@@ -922,8 +927,6 @@
 
     window.wartungEintragen = wartungEintragen;
 
-    // Reinigungsprotokoll speichern
-
     async function speichernProtokoll() {
       if (speichernBtn.disabled) return;
       speichernBtn.disabled = true;
@@ -931,7 +934,7 @@
       statusDiv.className = '';
       try {
         const data = {
-          automatCode: automatSelect.value,
+          automatCode: normalizeCode(automatSelect.value),
           stadt: stadtSelect.value,
           center: centerSelect.value,
           datum: new Date(datumInput.value),
