@@ -90,7 +90,7 @@
       color: #455a64;
     }
 
-    select, input[type="date"], input[type="number"], textarea {
+    select, input[type="date"], input[type="number"], textarea, input[type="text"] {
       width: 100%;
       padding: 14px 15px;
       margin: 2px 0 0;
@@ -190,6 +190,9 @@
     #status.ok { color: #1b5e20; }
     #status.err { color: #c62828; }
 
+    #wartungStatus.ok { color: #1b5e20; }
+    #wartungStatus.err { color: #c62828; }
+
     @media (min-width: 700px) {
       .stock-grid { flex-direction: row; flex-wrap: wrap; }
       .stock-field { width: 48%; }
@@ -253,8 +256,15 @@
         <div class="stock-field"><label for="zucker_gelb">Gelber Zucker</label><input type="number" id="zucker_gelb" step="0.5"></div>
         <div class="stock-field"><label for="zucker_blau">Blauer Zucker</label><input type="number" id="zucker_blau" step="0.5"></div>
         <div class="stock-field"><label for="zucker_weiss">Weißer Zucker</label><input type="number" id="zucker_weiss" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_weinrot">Weinrot</label><input type="number" id="zucker_weinrot" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_gruen">Grün</label><input type="number" id="zucker_gruen" step="0.5"></div>
+        <!-- Weinrot/Grün werden nur für CYJ1001014 eingeblendet -->
+        <div class="stock-field" id="feld_weinrot" style="display:none;">
+          <label for="zucker_weinrot">Weinrot</label>
+          <input type="number" id="zucker_weinrot" step="0.5">
+        </div>
+        <div class="stock-field" id="feld_gruen" style="display:none;">
+          <label for="zucker_gruen">Grün</label>
+          <input type="number" id="zucker_gruen" step="0.5">
+        </div>
         <div class="stock-field"><label for="staebe">Stäbe (Pakete)</label><input type="number" id="staebe" step="0.5"></div>
       </div>
     </div>
@@ -318,12 +328,52 @@
       </div>
     </div>
 
+    <!-- 5. Wartung erfassen -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">5. Wartung erfassen</div>
+        <div class="section-badge">Einzelwartung</div>
+      </div>
+
+      <div class="field-group">
+        <div>
+          <label for="wartungsartSelect">Wartungsart (aus Liste)</label>
+          <select id="wartungsartSelect" disabled>
+            <option>Wartung auswählen...</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="wartungFreitext">oder eigene Bezeichnung</label>
+          <input
+            type="text"
+            id="wartungFreitext"
+            placeholder="z.B. Brenner komplett gereinigt"
+          />
+        </div>
+
+        <div>
+          <label for="wartungNotizen">Details / Bemerkungen</label>
+          <textarea id="wartungNotizen" placeholder="Was wurde genau gemacht?"></textarea>
+        </div>
+
+        <button
+          class="main"
+          id="wartungSpeichernBtn"
+          disabled
+          onclick="wartungEintragen()"
+        >
+          🛠️ Wartung in System eintragen
+        </button>
+        <div id="wartungStatus" style="font-size:16px; margin-top:8px;"></div>
+      </div>
+    </div>
+
     <button class="main" id="speichernBtn" disabled onclick="speichernProtokoll()">✅ Protokoll speichern</button>
     <div id="status"></div>
   </div>
 
-  
-    <script>
+  <script>
     // --- Firebase Grundkonfiguration ---
     const firebaseConfig = {
       apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
@@ -347,7 +397,16 @@
     const speichernBtn = document.getElementById('speichernBtn');
     const statusDiv = document.getElementById('status');
 
-    // Elemente für Wochenwartung (werden gleich per JS ergänzt)
+    const wartungsartSelect = document.getElementById('wartungsartSelect');
+    const wartungFreitextInput = document.getElementById('wartungFreitext');
+    const wartungNotizenInput = document.getElementById('wartungNotizen');
+    const wartungSpeichernBtn = document.getElementById('wartungSpeichernBtn');
+    const wartungStatusDiv = document.getElementById('wartungStatus');
+
+    const feldWeinrot = document.getElementById('feld_weinrot');
+    const feldGruen = document.getElementById('feld_gruen');
+
+    // Elemente für Wochenwartung
     let wochenButton;
     let wochenTaskContainer;
     let wochenStatusDiv;
@@ -440,7 +499,7 @@
 
       pruefeFormular();
       ladeBestellungen();
-      ladeWochenwartung(); // Wochenwartung aktualisieren, wenn Automat gewechselt wird
+      ladeWochenwartung();
     }
 
     function pruefeFormular() {
@@ -452,6 +511,20 @@
         datumInput.value;
       speichernBtn.disabled = !ok;
       if (wochenButton) wochenButton.disabled = !ok;
+      if (wartungSpeichernBtn) wartungSpeichernBtn.disabled = !ok;
+    }
+
+    function updateSonderZuckerFelder() {
+      const code = automatSelect.value || '';
+      const sichtbar = code === 'CYJ1001014';
+      if (feldWeinrot) feldWeinrot.style.display = sichtbar ? 'flex' : 'none';
+      if (feldGruen) feldGruen.style.display = sichtbar ? 'flex' : 'none';
+      if (!sichtbar) {
+        const we = document.getElementById('zucker_weinrot');
+        const gr = document.getElementById('zucker_gruen');
+        if (we) we.value = '';
+        if (gr) gr.value = '';
+      }
     }
 
     stadtSelect.addEventListener('change', () => {
@@ -462,6 +535,7 @@
     });
     automatSelect.addEventListener('change', () => {
       pruefeFormular();
+      updateSonderZuckerFelder();
       ladeBestellungen();
       ladeWochenwartung();
     });
@@ -561,9 +635,8 @@
       }
     };
 
-    // --- 3. Wochenwartung (dynamisch aus Wartungselemente / Wochenstatus) ---
+    // --- 3. Wochenwartung (dynamisch) ---
 
-    // Hilfsfunktion: aktuelle Kalenderwoche grob als "YYYY-WW"
     function getCurrentWeekKey() {
       const d = new Date();
       const year = d.getFullYear();
@@ -573,11 +646,9 @@
       return `${year}-W${week.toString().padStart(2, '0')}`;
     }
 
-    // Wartungs-Section im DOM nachträglich einfügen
     function initWochenwartungUI() {
       const page = document.querySelector('.page');
       if (!page) return;
-      // neue Section nach „4. Funktionsprüfung“ einfügen
       const sections = document.querySelectorAll('.section');
       const lastSection = sections[sections.length - 1];
 
@@ -585,7 +656,7 @@
       section.className = 'section';
       section.innerHTML = `
         <div class="section-header">
-          <div class="section-title">5. Wöchentliche Wartung</div>
+          <div class="section-title">6. Wöchentliche Wartung</div>
           <div class="section-badge">7‑Tage‑Zeitraum</div>
         </div>
         <div class="field-group">
@@ -609,8 +680,6 @@
       pruefeFormular();
     }
 
-    // Wochenwartung laden: wenn openDialog == true, Aufgaben anzeigen,
-    // sonst nur Status/Hinweis (Freitag).
     async function ladeWochenwartung(openDialog = false) {
       if (!automatSelect.value || !mitarbeiterSelect.value) {
         if (wochenStatusDiv) wochenStatusDiv.textContent = '';
@@ -621,7 +690,6 @@
       const weekKey = getCurrentWeekKey();
       const automatCode = automatSelect.value;
 
-      // vorhandenes Wochen-Dokument suchen
       const q = await db
         .collection('wochenWartung')
         .where('automatCode', '==', automatCode)
@@ -635,13 +703,10 @@
       if (!q.empty) {
         docRef = q.docs[0].ref;
         docData = q.docs[0].data();
-      } else {
-        // noch nichts vorhanden – erst beim Öffnen des Dialogs anlegen
       }
 
-      // einfache Freitagsprüfung für Hinweis
       const today = new Date();
-      const isFriday = today.getDay() === 5; // 5 = Freitag
+      const isFriday = today.getDay() === 5;
       if (wochenStatusDiv) {
         if (docData && docData.status === 'erledigt') {
           wochenStatusDiv.textContent = 'Wöchentliche Wartung: erledigt.';
@@ -655,7 +720,6 @@
 
       if (!openDialog) return;
 
-      // Dialog-Ansicht: Wartungselemente (typ = "Wochenwartung") laden
       const elementsSnap = await db
         .collection('Wartungselemente')
         .where('typ', '==', 'Wochenwartung')
@@ -693,14 +757,12 @@
         tasks.push({ id, checkbox });
       });
 
-      // Speichern-Button unter die Aufgaben setzen
       const saveBtn = document.createElement('button');
       saveBtn.className = 'main';
       saveBtn.textContent = '✅ Wochenwartung speichern';
       saveBtn.style.marginTop = '16px';
 
       saveBtn.onclick = async () => {
-        // tasks -> Firestore-Struktur
         const newTasks = {};
         let allDone = true;
         tasks.forEach(t => {
@@ -715,7 +777,6 @@
         const newStatus = allDone ? 'erledigt' : 'teilweise';
 
         if (!docRef) {
-          // neues Wochen-Dokument anlegen
           const payload = {
             automatCode,
             woche: weekKey,
@@ -743,7 +804,107 @@
       wochenTaskContainer.appendChild(saveBtn);
     }
 
-    // --- 4. Reinigungsprotokoll speichern (bestehende Logik) ---
+    // --- Wartungselemente (Dropdown für Einzelwartung) ---
+
+    async function ladeWartungselemente() {
+      if (!wartungsartSelect) return;
+      wartungsartSelect.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.textContent = 'Wartung auswählen...';
+      placeholder.value = '';
+      wartungsartSelect.appendChild(placeholder);
+      wartungsartSelect.disabled = true;
+
+      const snap = await db
+        .collection('Wartungselemente')
+        .where('typ', 'in', [null, '', 'Protokoll'])
+        .get();
+
+      const items = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        const label = d.bezeichnung || 'Wartung';
+        items.push({ id: doc.id, label });
+      });
+      items.sort((a, b) => a.label.localeCompare(b.label, 'de'));
+
+      items.forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.label;
+        opt.textContent = it.label;
+        wartungsartSelect.appendChild(opt);
+      });
+
+      wartungsartSelect.disabled = false;
+    }
+
+    async function wartungEintragen() {
+      if (!wartungSpeichernBtn || wartungSpeichernBtn.disabled) return;
+
+      const automatCode = automatSelect.value;
+      const mitarbeiter = mitarbeiterSelect.value;
+      const datumStr = datumInput.value;
+
+      const ausListe = wartungsartSelect && wartungsartSelect.value
+        ? wartungsartSelect.value.trim()
+        : '';
+      const frei = wartungFreitextInput && wartungFreitextInput.value
+        ? wartungFreitextInput.value.trim()
+        : '';
+
+      const bezeichnung = ausListe || frei;
+
+      if (!bezeichnung) {
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent =
+            'Bitte Wartungsart auswählen oder eigene Bezeichnung eingeben.';
+          wartungStatusDiv.className = 'err';
+        }
+        return;
+      }
+
+      wartungSpeichernBtn.disabled = true;
+      if (wartungStatusDiv) {
+        wartungStatusDiv.textContent = 'Wartung wird gespeichert…';
+        wartungStatusDiv.className = '';
+      }
+
+      try {
+        const datumObj = datumStr ? new Date(datumStr) : new Date();
+        const datumAnzeige = datumObj.toLocaleDateString('de-DE');
+
+        const payload = {
+          automatCode,
+          bezeichnung,
+          datumDerDurchfuhrung: datumAnzeige,
+          name: mitarbeiter,
+          notizen: wartungNotizenInput ? wartungNotizenInput.value.trim() : '',
+          erstelltAm: new Date(),
+        };
+
+        await db.collection('Wartungsprotokolle').add(payload);
+
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent = '🛠️ Wartung im Wartungsprotokoll gespeichert.';
+          wartungStatusDiv.className = 'ok';
+        }
+
+        if (wartungFreitextInput) wartungFreitextInput.value = '';
+        if (wartungNotizenInput) wartungNotizenInput.value = '';
+      } catch (err) {
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent =
+            '❌ Fehler beim Speichern der Wartung: ' + err.message;
+          wartungStatusDiv.className = 'err';
+        }
+      } finally {
+        wartungSpeichernBtn.disabled = false;
+      }
+    }
+
+    window.wartungEintragen = wartungEintragen;
+
+    // --- 4. Reinigungsprotokoll speichern ---
 
     async function speichernProtokoll() {
       if (speichernBtn.disabled) return;
@@ -780,8 +941,9 @@
           zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
           zucker_weiss: parseFloat(document.getElementById('zucker_weiss').value) || 0,
           zucker_weinrot:
-            parseFloat(document.getElementById('zucker_weinrot').value) || 0,
-          zucker_gruen: parseFloat(document.getElementById('zucker_gruen').value) || 0,
+            parseFloat(document.getElementById('zucker_weinrot')?.value || 0) || 0,
+          zucker_gruen:
+            parseFloat(document.getElementById('zucker_gruen')?.value || 0) || 0,
           staebe: parseFloat(document.getElementById('staebe').value) || 0,
 
           befeuchtungstest: document.getElementById('befeuchtung').checked,
@@ -809,12 +971,12 @@
       }
     }
 
-    // Exponiere speichernProtokoll für Button
     window.speichernProtokoll = speichernProtokoll;
 
     // Start: UI aufbauen
     initWochenwartungUI();
     ladeStaedte();
+    ladeWartungselemente();
   </script>
 
 </body>
