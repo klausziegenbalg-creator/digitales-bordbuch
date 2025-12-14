@@ -256,7 +256,7 @@
         <div class="stock-field"><label for="zucker_gelb">Gelber Zucker</label><input type="number" id="zucker_gelb" step="0.5"></div>
         <div class="stock-field"><label for="zucker_blau">Blauer Zucker</label><input type="number" id="zucker_blau" step="0.5"></div>
         <div class="stock-field"><label for="zucker_weiss">Weißer Zucker</label><input type="number" id="zucker_weiss" step="0.5"></div>
-        <!-- Weinrot/Grün werden nur für CYJ1001014 eingeblendet -->
+        <!-- Weinrot/Grün nur für CYJ1001014 -->
         <div class="stock-field" id="feld_weinrot" style="display:none;">
           <label for="zucker_weinrot">Weinrot</label>
           <input type="number" id="zucker_weinrot" step="0.5">
@@ -280,8 +280,9 @@
         <button class="order-btn" id="btn-vanille"  onclick="toggleBestellung('vanille')">🍭 Gelb (2 Tüten)</button>
         <button class="order-btn" id="btn-blaubeere"onclick="toggleBestellung('blaubeere')">🫐 Blau (2 Tüten)</button>
         <button class="order-btn" id="btn-normal"  onclick="toggleBestellung('normal')">🍭 Weiß (2 Tüten)</button>
-        <button class="order-btn" id="btn-apfel"   onclick="toggleBestellung('apfel')">🍏 Grün (2 Tüten)</button>
-        <button class="order-btn" id="btn-kirsch"  onclick="toggleBestellung('kirsch')">🍒 Weinrot (2 Tüten)</button>
+        <!-- Grün/Weinrot nur für CYJ1001014 -->
+        <button class="order-btn" id="btn-apfel"   style="display:none;" onclick="toggleBestellung('apfel')">🍏 Grün (2 Tüten)</button>
+        <button class="order-btn" id="btn-kirsch"  style="display:none;" onclick="toggleBestellung('kirsch')">🍒 Weinrot (2 Tüten)</button>
         <button class="order-btn" id="btn-staebe"  onclick="toggleStaebe()">🧊 Stäbe (2 Pakete)</button>
       </div>
     </div>
@@ -328,14 +329,34 @@
       </div>
     </div>
 
-    <!-- 5. Wartung erfassen -->
+    <!-- 5. Wöchentliche Wartung (verdeckbar) -->
     <div class="section">
       <div class="section-header">
-        <div class="section-title">5. Wartung erfassen</div>
-        <div class="section-badge">Einzelwartung</div>
+        <div class="section-title">5. Wöchentliche Wartung</div>
+        <button class="main" id="toggleWochenwartungBtn" style="margin:0; padding:8px 16px; font-size:14px;">
+          Wöchentliche Wartung anzeigen
+        </button>
+      </div>
+      <div class="field-group" id="wochenwartungSection" style="display:none;">
+        <div class="section-badge">7‑Tage‑Zeitraum</div>
+        <button class="main" id="wochenwartungBtn" disabled>🛠️ Wöchentliche Wartung öffnen</button>
+        <div id="wochenwartungStatus" style="font-size:16px; margin-top:8px;"></div>
+        <div id="wochenwartungTasks" class="task-list" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- 6. Wartung erfassen (verdeckbar) -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">6. Wartung erfassen</div>
+        <button class="main" id="toggleWartungBtn" style="margin:0; padding:8px 16px; font-size:14px;">
+          Wartung anzeigen
+        </button>
       </div>
 
-      <div class="field-group">
+      <div class="field-group" id="wartungSection" style="display:none;">
+        <div class="section-badge">Einzelwartung</div>
+
         <div>
           <label for="wartungsartSelect">Wartungsart (aus Liste)</label>
           <select id="wartungsartSelect" disabled>
@@ -374,7 +395,6 @@
   </div>
 
   <script>
-    // --- Firebase Grundkonfiguration ---
     const firebaseConfig = {
       apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
       authDomain: "digitales-bordbuch.firebaseapp.com",
@@ -388,7 +408,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // --- DOM-Referenzen ---
     const stadtSelect = document.getElementById('stadtSelect');
     const centerSelect = document.getElementById('centerSelect');
     const automatSelect = document.getElementById('automatSelect');
@@ -405,12 +424,17 @@
 
     const feldWeinrot = document.getElementById('feld_weinrot');
     const feldGruen = document.getElementById('feld_gruen');
+    const btnApfel = document.getElementById('btn-apfel');
+    const btnKirsch = document.getElementById('btn-kirsch');
 
-    // Elemente für Wochenwartung
+    const toggleWochenwartungBtn = document.getElementById('toggleWochenwartungBtn');
+    const wochenwartungSection = document.getElementById('wochenwartungSection');
+    const toggleWartungBtn = document.getElementById('toggleWartungBtn');
+    const wartungSection = document.getElementById('wartungSection');
+
     let wochenButton;
     let wochenTaskContainer;
     let wochenStatusDiv;
-
     let unsubscribeBestellungen = null;
 
     const heute = new Date().toISOString().split('T')[0];
@@ -425,8 +449,6 @@
       o.value = val;
       sel.appendChild(o);
     }
-
-    // --- 1. Daten für Auswahl laden (Automat / Stadt / Center / Mitarbeiter) ---
 
     async function ladeStaedte() {
       clearSelect(stadtSelect);
@@ -519,6 +541,8 @@
       const sichtbar = code === 'CYJ1001014';
       if (feldWeinrot) feldWeinrot.style.display = sichtbar ? 'flex' : 'none';
       if (feldGruen) feldGruen.style.display = sichtbar ? 'flex' : 'none';
+      if (btnApfel) btnApfel.style.display = sichtbar ? 'block' : 'none';
+      if (btnKirsch) btnKirsch.style.display = sichtbar ? 'block' : 'none';
       if (!sichtbar) {
         const we = document.getElementById('zucker_weinrot');
         const gr = document.getElementById('zucker_gruen');
@@ -542,7 +566,24 @@
     mitarbeiterSelect.addEventListener('change', pruefeFormular);
     datumInput.addEventListener('change', pruefeFormular);
 
-    // --- 2. Bestellungen (Zucker / Stäbe) ---
+    // Toggle Sichtbarkeit Wartungsbereiche
+    toggleWochenwartungBtn.addEventListener('click', () => {
+      const sichtbar = wochenwartungSection.style.display === 'block';
+      wochenwartungSection.style.display = sichtbar ? 'none' : 'block';
+      toggleWochenwartungBtn.textContent = sichtbar
+        ? 'Wöchentliche Wartung anzeigen'
+        : 'Wöchentliche Wartung ausblenden';
+    });
+
+    toggleWartungBtn.addEventListener('click', () => {
+      const sichtbar = wartungSection.style.display === 'block';
+      wartungSection.style.display = sichtbar ? 'none' : 'block';
+      toggleWartungBtn.textContent = sichtbar
+        ? 'Wartung anzeigen'
+        : 'Wartung ausblenden';
+    });
+
+    // --- Bestellungen ---
 
     function setButtonState(id, on) {
       const b = document.getElementById(id);
@@ -635,7 +676,7 @@
       }
     };
 
-    // --- 3. Wochenwartung (dynamisch) ---
+    // --- Wochenwartung ---
 
     function getCurrentWeekKey() {
       const d = new Date();
@@ -647,26 +688,6 @@
     }
 
     function initWochenwartungUI() {
-      const page = document.querySelector('.page');
-      if (!page) return;
-      const sections = document.querySelectorAll('.section');
-      const lastSection = sections[sections.length - 1];
-
-      const section = document.createElement('div');
-      section.className = 'section';
-      section.innerHTML = `
-        <div class="section-header">
-          <div class="section-title">6. Wöchentliche Wartung</div>
-          <div class="section-badge">7‑Tage‑Zeitraum</div>
-        </div>
-        <div class="field-group">
-          <button class="main" id="wochenwartungBtn" disabled>🛠️ Wöchentliche Wartung öffnen</button>
-          <div id="wochenwartungStatus" style="font-size:16px; margin-top:8px;"></div>
-          <div id="wochenwartungTasks" class="task-list" style="margin-top:8px;"></div>
-        </div>
-      `;
-      lastSection.after(section);
-
       wochenButton = document.getElementById('wochenwartungBtn');
       wochenTaskContainer = document.getElementById('wochenwartungTasks');
       wochenStatusDiv = document.getElementById('wochenwartungStatus');
@@ -676,7 +697,6 @@
           ladeWochenwartung(true);
         });
       }
-
       pruefeFormular();
     }
 
@@ -804,7 +824,7 @@
       wochenTaskContainer.appendChild(saveBtn);
     }
 
-    // --- Wartungselemente (Dropdown für Einzelwartung) ---
+    // --- Wartungselemente für Einzelwartung ---
 
     async function ladeWartungselemente() {
       if (!wartungsartSelect) return;
@@ -817,7 +837,7 @@
 
       const snap = await db
         .collection('Wartungselemente')
-        .where('typ', 'in', [null, '', 'Protokoll'])
+        .where('typ', 'in', ['', 'Protokoll'])
         .get();
 
       const items = [];
@@ -904,7 +924,7 @@
 
     window.wartungEintragen = wartungEintragen;
 
-    // --- 4. Reinigungsprotokoll speichern ---
+    // --- Reinigungsprotokoll speichern ---
 
     async function speichernProtokoll() {
       if (speichernBtn.disabled) return;
@@ -973,7 +993,7 @@
 
     window.speichernProtokoll = speichernProtokoll;
 
-    // Start: UI aufbauen
+    // Start
     initWochenwartungUI();
     ladeStaedte();
     ladeWartungselemente();
