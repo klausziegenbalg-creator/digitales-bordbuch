@@ -67,3 +67,9 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+.DS_Store
+test-*.js
+chitu-orders.js
+package.json
+package-lock.json
+public/alteindex.html
