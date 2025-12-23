@@ -1,14 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reinigungsprotokoll Automaten</title>
-
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reinigungsprotokoll Automaten</title>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<style>
     :root {
       --bg-top: #e3f2fd;
       --bg-main: #f4f6fb;
@@ -59,7 +58,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .section-title {
@@ -74,6 +75,7 @@
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent-strong);
+      white-space: nowrap;
     }
 
     .field-group {
@@ -90,7 +92,7 @@
       color: #455a64;
     }
 
-    select, input[type="date"], input[type="number"], textarea {
+    select, input[type="date"], input[type="number"], textarea, input[type="text"] {
       width: 100%;
       padding: 14px 15px;
       margin: 2px 0 0;
@@ -186,157 +188,263 @@
 
     button.main:disabled { background: #b0bec5; box-shadow: none; cursor: not-allowed; }
 
+    /* kleine Toggle-Buttons in den Abschnitts-Headern */
+    button.section-toggle .arrow{
+      display:inline-block;
+      width:1.2em;
+      text-align:center;
+      margin-right:6px;
+      font-weight:800;
+    }
+    .section-toggle {
+      margin: 0;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-weight: 700;
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
     #status { margin: 16px 4px 0; font-size: 16px; }
     #status.ok { color: #1b5e20; }
     #status.err { color: #c62828; }
+
+    #wartungStatus.ok { color: #1b5e20; }
+    #wartungStatus.err { color: #c62828; }
 
     @media (min-width: 700px) {
       .stock-grid { flex-direction: row; flex-wrap: wrap; }
       .stock-field { width: 48%; }
     }
-  </style>
+  
+
+    /* --- Language switcher --- */
+    .lang-switch{
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      margin:10px 0 16px;
+      flex-wrap:wrap;
+    }
+    .lang-btn{
+      border:1px solid #e0e4f0;
+      background:#fff;
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .lang-btn.active{
+      background:#1976d2;
+      color:#fff;
+      border-color:#1976d2;
+    }
+    .lang-switch--pin{
+      justify-content:center;
+      margin-top:14px;
+    }
+    .lang-btn--pin{
+      padding:6px 10px;
+      font-weight:800;
+      font-size:12px;
+    }
+    /* RTL support (Arabic) */
+    html[dir="rtl"] body{
+      direction:rtl;
+      text-align:right;
+    }
+    html[dir="rtl"] .lang-switch{
+      justify-content:flex-start;
+    }
+</style>
 </head>
 <body>
-
-  <!-- PIN Gate -->
-  <div id="pinGate" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#f5f7fb; z-index:9999;">
-    <div style="background:#fff; border:1px solid #e0e4f0; border-radius:16px; padding:18px; width:340px; box-shadow:0 10px 25px rgba(15,23,42,0.08);">
-      <div style="font-weight:900; font-size:18px; margin-bottom:8px; color:#0d47a1;">PIN erforderlich</div>
-      <div style="color:#6b7280; font-size:13px; margin-bottom:10px;">Bitte PIN eingeben, um fortzufahren.</div>
-      <input id="pinInput" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="PIN" style="width:100%; padding:10px 12px; border:1px solid #e0e4f0; border-radius:10px; font-size:14px;">
-      <div id="pinError" style="color:#dc2626; font-size:12px; margin-top:8px; display:none;"></div>
-      <button id="pinBtn" style="margin-top:12px; width:100%; padding:10px 12px; border-radius:10px; border:0; background:#1976d2; color:#fff; font-weight:900; cursor:pointer;">
+<!-- PIN Gate -->
+<div id="pinGate" style="position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#f5f7fb; z-index:9999;">
+<div style="background:#fff; border:1px solid #e0e4f0; border-radius:16px; padding:18px; width:340px; box-shadow:0 10px 25px rgba(15,23,42,0.08);">
+<div data-i18n="pin_required" style="font-weight:900; font-size:18px; margin-bottom:8px; color:#0d47a1;">PIN erforderlich</div>
+<div data-i18n="pin_prompt" style="color:#6b7280; font-size:13px; margin-bottom:10px;">Bitte PIN eingeben, um fortzufahren.</div>
+<input autocomplete="one-time-code" id="pinInput" inputmode="numeric" placeholder="PIN" style="width:100%; padding:10px 12px; border:1px solid #e0e4f0; border-radius:10px; font-size:14px;" type="password"/>
+<div id="pinError" style="color:#dc2626; font-size:12px; margin-top:8px; display:none;"></div>
+<button data-i18n="login" id="pinBtn" style="margin-top:12px; width:100%; padding:10px 12px; border-radius:10px; border:0; background:#1976d2; color:#fff; font-weight:900; cursor:pointer;">
         Einloggen
       </button>
-    </div>
-  </div>
-
-  <div class="page">
-    <h1>Reinigungsprotokoll Automaten</h1>
-    <h2>Automatenservice Schiemann &amp; Automatenservice Albrecht</h2>
-
-    <!-- 1. Automat auswählen -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">1. Automat auswählen</div>
-        <div class="section-badge">Pflichtangaben</div>
-      </div>
-      <div class="field-group">
-        <div><label for="stadtSelect">Stadt</label><select id="stadtSelect"><option>Wähle Stadt...</option></select></div>
-        <div><label for="centerSelect">Center</label><select id="centerSelect" disabled><option>Wähle Center...</option></select></div>
-        <div><label for="automatSelect">Automat</label><select id="automatSelect" disabled><option>Wähle Automat...</option></select></div>
-        <div><label for="datum">Datum</label><input type="date" id="datum" /></div>
-        <div><label for="mitarbeiterSelect">Mitarbeiter / Leitung</label><select id="mitarbeiterSelect" disabled><option>Mitarbeiter wählen...</option></select></div>
-      </div>
-    </div>
-
-    <!-- 2. Aufgaben pro Automat -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">2. Aufgaben pro Automat</div>
-        <div class="section-badge">Ankreuzen</div>
-      </div>
-      <div class="task-list">
-        <div class="task-row"><input type="checkbox" id="zucker"><div class="task-label">Zucker aufgefüllt</div></div>
-        <div class="task-row"><input type="checkbox" id="wasser"><div class="task-label">Wasser aufgefüllt</div></div>
-        <div class="task-row"><input type="checkbox" id="staebeAuf"><div class="task-label">Stäbe aufgefüllt</div></div>
-        <div class="task-row"><input type="checkbox" id="zuckerfach"><div class="task-label">Zuckerfach gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="faecher"><div class="task-label">Alle Fächer gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="abwasser"><div class="task-label">Abwasser entleert</div></div>
-        <div class="task-row"><input type="checkbox" id="produktionsraum"><div class="task-label">Produktionsraum gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="messer"><div class="task-label">Messer + Rädchen gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="roboterarm"><div class="task-label">Roboterarm gründlich gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="sieb"><div class="task-label">Sieb oben gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="auffangschale"><div class="task-label">Auffangschale gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="aufbewahrung"><div class="task-label">Aufbewahrungsfach aufgeräumt</div></div>
-        <div class="task-row"><input type="checkbox" id="aussen"><div class="task-label">Automat außen gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="scheiben"><div class="task-label">Scheiben gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="brennerkopf"><div class="task-label">Brennerkopf gereinigt</div></div>
-        <div class="task-row"><input type="checkbox" id="duese"><div class="task-label">Düse hinter Brennerkopf gereinigt</div></div>
-      </div>
-    </div>
-
-    <!-- 3. Bestände -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">3. Bestände pro Packung</div>
-        <div class="section-badge">Füllstände</div>
-      </div>
-      <div class="stock-grid">
-        <div class="stock-field"><label for="zucker_rot">Roter Zucker</label><input type="number" id="zucker_rot" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_gelb">Gelber Zucker</label><input type="number" id="zucker_gelb" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_blau">Blauer Zucker</label><input type="number" id="zucker_blau" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_weiss">Weißer Zucker</label><input type="number" id="zucker_weiss" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_weinrot">Weinrot</label><input type="number" id="zucker_weinrot" step="0.5"></div>
-        <div class="stock-field"><label for="zucker_gruen">Grün</label><input type="number" id="zucker_gruen" step="0.5"></div>
-        <div class="stock-field"><label for="staebe">Stäbe (Pakete)</label><input type="number" id="staebe" step="0.5"></div>
-      </div>
-    </div>
-
-    <!-- 3.5 Bestellungen -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">3.5 Bestellungen</div>
-        <div class="section-badge">Sofortbestellen</div>
-      </div>
-      <div class="order-buttons">
-        <button class="order-btn" id="btn-erdbeere" onclick="toggleBestellung('erdbeere')">🍓 Rot (2 Tüten)</button>
-        <button class="order-btn" id="btn-vanille"  onclick="toggleBestellung('vanille')">🍭 Gelb (2 Tüten)</button>
-        <button class="order-btn" id="btn-blaubeere"onclick="toggleBestellung('blaubeere')">🫐 Blau (2 Tüten)</button>
-        <button class="order-btn" id="btn-normal"  onclick="toggleBestellung('normal')">🍭 Weiß (2 Tüten)</button>
-        <button class="order-btn" id="btn-apfel"   onclick="toggleBestellung('apfel')">🍏 Grün (2 Tüten)</button>
-        <button class="order-btn" id="btn-kirsch"  onclick="toggleBestellung('kirsch')">🍒 Weinrot (2 Tüten)</button>
-        <button class="order-btn" id="btn-staebe"  onclick="toggleStaebe()">🧊 Stäbe (2 Pakete)</button>
-      </div>
-    </div>
-
-    <!-- 4. Funktionsprüfung -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">4. Funktionsprüfung</div>
-        <div class="section-badge">Testläufe</div>
-      </div>
-      <div class="task-list">
-        <div class="task-row">
-          <input type="checkbox" id="befeuchtung">
-          <div class="task-label">Befeuchtungstest</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="reinigungstest">
-          <div class="task-label">Reinigungstest</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="neuer_stab">
-          <div class="task-label">Neuen Stab genommen</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="roboterarm_90grad">
-          <div class="task-label">Roboterarm im 90°‑Winkel</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="kreditkarte_ok">
-          <div class="task-label">Kreditkartensystem OK</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="geldschein_ok">
-          <div class="task-label">Geldschein‑System OK</div>
-        </div>
-        <div class="task-row">
-          <input type="checkbox" id="material_eingetragen">
-          <div class="task-label">Material im System eingetragen</div>
-        </div>
-      </div>
-      <div style="margin-top:12px;">
-        <label for="auffaelligkeiten">Auffälligkeiten</label>
-        <textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
-      </div>
-    </div>
-
-    <button class="main" id="speichernBtn" disabled onclick="speichernProtokoll()">✅ Protokoll speichern</button>
-    <div id="status"></div>
-  </div>
-
-  <script>
+<div class="lang-switch lang-switch--pin"><button class="lang-btn lang-btn--pin" data-lang="de" type="button">Deutsch</button><button class="lang-btn lang-btn--pin" data-lang="en" type="button">English</button><button class="lang-btn lang-btn--pin" data-lang="tr" type="button">Türkçe</button><button class="lang-btn lang-btn--pin" data-lang="ar" type="button">العربية</button></div></div>
+</div>
+<div class="page" data-i18n="sec1">
+<h1 data-i18n="title">Reinigungsprotokoll Automaten</h1>
+<h2 data-i18n="subtitle">Automatenservice Schiemann &amp; Automatenservice Albrecht</h2><div class="lang-switch"><button class="lang-btn" data-lang="de" type="button">Deutsch</button><button class="lang-btn" data-lang="en" type="button">English</button><button class="lang-btn" data-lang="tr" type="button">Türkçe</button><button class="lang-btn" data-lang="ar" type="button">العربية</button></div>
+<!-- 1. Automat auswählen -->
+<div class="section">
+<div class="section-header">
+<div class="section-title">1. Automat auswählen</div>
+<div class="section-badge">Pflichtangaben</div>
+</div>
+<div class="field-group">
+<div><label data-i18n="lbl_city" for="stadtSelect">Stadt</label><select id="stadtSelect"><option>Wähle Stadt...</option></select></div>
+<div><label data-i18n="lbl_center" for="centerSelect">Center</label><select disabled="" id="centerSelect"><option>Wähle Center...</option></select></div>
+<div><label data-i18n="lbl_machine" for="automatSelect">Automat</label><select disabled="" id="automatSelect"><option>Wähle Automat...</option></select></div>
+<div><label data-i18n="lbl_date" for="datum">Datum</label><input id="datum" type="date"/></div>
+<div><label data-i18n="lbl_staff" for="mitarbeiterSelect">Mitarbeiter / Leitung</label><select disabled="" id="mitarbeiterSelect"><option>Mitarbeiter wählen...</option></select></div>
+</div>
+</div>
+<!-- 2. Aufgaben pro Automat (ausklappbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec2">2. Aufgaben pro Automat</div>
+<div style="display:flex; align-items:center; gap:10px;">
+<div class="section-badge">Ankreuzen</div>
+<button class="section-toggle" id="toggleAufgabenBtn" type="button">Einklappen</button>
+</div>
+</div>
+<div id="aufgabenSection" style="display:none;">
+<div class="task-list">
+<div class="task-row"><input id="zucker" type="checkbox"/><div class="task-label">Zucker aufgefüllt</div></div>
+<div class="task-row"><input id="wasser" type="checkbox"/><div class="task-label">Wasser aufgefüllt</div></div>
+<div class="task-row"><input id="staebeAuf" type="checkbox"/><div class="task-label">Stäbe aufgefüllt</div></div>
+<div class="task-row"><input id="zuckerfach" type="checkbox"/><div class="task-label">Zuckerfach gereinigt</div></div>
+<div class="task-row"><input id="faecher" type="checkbox"/><div class="task-label">Alle Fächer gereinigt</div></div>
+<div class="task-row"><input id="abwasser" type="checkbox"/><div class="task-label">Abwasser entleert</div></div>
+<div class="task-row"><input id="produktionsraum" type="checkbox"/><div class="task-label">Produktionsraum gereinigt</div></div>
+<div class="task-row"><input id="messer" type="checkbox"/><div class="task-label">Messer + Rädchen gereinigt</div></div>
+<div class="task-row"><input id="roboterarm" type="checkbox"/><div class="task-label">Roboterarm gründlich gereinigt</div></div>
+<div class="task-row"><input id="sieb" type="checkbox"/><div class="task-label">Sieb oben gereinigt</div></div>
+<div class="task-row"><input id="auffangschale" type="checkbox"/><div class="task-label">Auffangschale gereinigt</div></div>
+<div class="task-row"><input id="aufbewahrung" type="checkbox"/><div class="task-label">Aufbewahrungsfach aufgeräumt</div></div>
+<div class="task-row"><input id="aussen" type="checkbox"/><div class="task-label">Automat außen gereinigt</div></div>
+<div class="task-row"><input id="scheiben" type="checkbox"/><div class="task-label">Scheiben gereinigt</div></div>
+<div class="task-row"><input id="brennerkopf" type="checkbox"/><div class="task-label">Brennerkopf gereinigt</div></div>
+<div class="task-row"><input id="duese" type="checkbox"/><div class="task-label">Düse hinter Brennerkopf gereinigt</div></div>
+</div>
+</div>
+</div>
+<!-- 3. Funktionsprüfung (ausklappbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec3">3. Funktionsprüfung</div>
+<div style="display:flex; align-items:center; gap:10px;">
+<div class="section-badge">Testläufe</div>
+<button class="section-toggle" id="toggleFunktionBtn" type="button">Einklappen</button>
+</div>
+</div>
+<div id="funktionSection" style="display:none;">
+<div class="task-list">
+<div class="task-row"><input id="befeuchtung" type="checkbox"/><div class="task-label">Befeuchtungstest</div></div>
+<div class="task-row"><input id="reinigungstest" type="checkbox"/><div class="task-label">Reinigungstest</div></div>
+<div class="task-row"><input id="neuer_stab" type="checkbox"/><div class="task-label">Neuen Stab genommen</div></div>
+<div class="task-row"><input id="roboterarm_90grad" type="checkbox"/><div class="task-label">Roboterarm im 90°‑Winkel</div></div>
+<div class="task-row"><input id="kreditkarte_ok" type="checkbox"/><div class="task-label">Kreditkartensystem OK</div></div>
+<div class="task-row"><input id="geldschein_ok" type="checkbox"/><div class="task-label">Geldschein‑System OK</div></div>
+<div class="task-row"><input id="material_eingetragen" type="checkbox"/><div class="task-label">Material im System eingetragen</div></div>
+</div>
+<div style="margin-top:12px;">
+<label data-i18n="lbl_notes" for="auffaelligkeiten">Auffälligkeiten</label>
+<textarea id="auffaelligkeiten" placeholder="Alles ok oder Probleme notieren..."></textarea>
+</div>
+</div>
+</div>
+<!-- 4. Bestände (ausklappbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec4">4. Bestände pro Packung</div>
+<div style="display:flex; align-items:center; gap:10px;">
+<div class="section-badge">Füllstände</div>
+<button class="section-toggle" id="toggleBestaendeBtn" type="button">Einklappen</button>
+</div>
+</div>
+<div id="bestaendeSection" style="display:none;">
+<div class="stock-grid">
+<div class="stock-field"><label data-i18n="lbl_sugar_red" for="zucker_rot">Roter Zucker</label><input id="zucker_rot" step="0.5" type="number"/></div>
+<div class="stock-field"><label data-i18n="lbl_sugar_yellow" for="zucker_gelb">Gelber Zucker</label><input id="zucker_gelb" step="0.5" type="number"/></div>
+<div class="stock-field"><label data-i18n="lbl_sugar_blue" for="zucker_blau">Blauer Zucker</label><input id="zucker_blau" step="0.5" type="number"/></div>
+<div class="stock-field"><label data-i18n="lbl_sugar_white" for="zucker_weiss">Weißer Zucker</label><input id="zucker_weiss" step="0.5" type="number"/></div>
+<div class="stock-field" id="feld_weinrot" style="display:none;">
+<label data-i18n="lbl_sugar_winered" for="zucker_weinrot">Weinrot</label>
+<input id="zucker_weinrot" step="0.5" type="number"/>
+</div>
+<div class="stock-field" id="feld_gruen" style="display:none;">
+<label data-i18n="lbl_sugar_green" for="zucker_gruen">Grün</label>
+<input id="zucker_gruen" step="0.5" type="number"/>
+</div>
+<div class="stock-field"><label data-i18n="lbl_sticks" for="staebe">Stäbe (Pakete)</label><input id="staebe" step="0.5" type="number"/></div>
+</div>
+</div>
+</div>
+<!-- 5. Bestellungen (ausklappbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec5">5. Bestellungen</div>
+<div style="display:flex; align-items:center; gap:10px;">
+<div class="section-badge">Sofortbestellen</div>
+<button class="section-toggle" id="toggleBestellungenBtn" type="button">Einklappen</button>
+</div>
+</div>
+<div id="bestellungenSection" style="display:none;">
+<div class="order-buttons">
+<button class="order-btn" data-i18n="inv_red" id="btn-erdbeere" onclick="toggleBestellung('erdbeere')">🍓 Rot (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_yellow" id="btn-vanille" onclick="toggleBestellung('vanille')">🍭 Gelb (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_blue" id="btn-blaubeere" onclick="toggleBestellung('blaubeere')">🫐 Blau (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_white" id="btn-normal" onclick="toggleBestellung('normal')">🍭 Weiß (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_green" id="btn-apfel" onclick="toggleBestellung('apfel')" style="display:none;">🍏 Grün (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_winered" id="btn-kirsch" onclick="toggleBestellung('kirsch')" style="display:none;">🍒 Weinrot (2 Tüten)</button>
+<button class="order-btn" data-i18n="inv_sticks" id="btn-staebe" onclick="toggleStaebe()">🧊 Stäbe (2 Pakete)</button>
+</div>
+</div>
+</div>
+<!-- 6. Wöchentliche Wartung (verdeckbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec6">6. Wöchentliche Wartung</div>
+<button class="section-toggle" data-i18n="toggle_weekly" id="toggleWochenwartungBtn" type="button">
+          Wöchentliche Wartung anzeigen
+        </button>
+</div>
+<div class="field-group" id="wochenwartungSection" style="display:none;">
+<div class="section-badge">7‑Tage‑Zeitraum</div>
+<button class="main" data-i18n="open_weekly" disabled="" id="wochenwartungBtn" type="button">🛠️ Wöchentliche Wartung öffnen</button>
+<div id="wochenwartungStatus" style="font-size:16px; margin-top:8px;"></div>
+<div class="task-list" id="wochenwartungTasks" style="margin-top:8px;"></div>
+</div>
+</div>
+<!-- 7. Reparaturen (verdeckbar) -->
+<div class="section">
+<div class="section-header">
+<div class="section-title" data-i18n="sec7">7. Reparaturen</div>
+<button class="section-toggle" data-i18n="toggle_repairs" id="toggleWartungBtn" type="button">
+          Wartung anzeigen
+        </button>
+</div>
+<div class="field-group" id="wartungSection" style="display:none;">
+<div class="section-badge">Einzelwartung</div>
+<div>
+<label data-i18n="lbl_repair_type_list" for="wartungsartSelect">Wartungsart (aus Liste)</label>
+<select disabled="" id="wartungsartSelect">
+<option>Wartung auswählen...</option>
+</select>
+</div>
+<div>
+<label data-i18n="lbl_repair_type_custom" for="wartungFreitext">oder eigene Bezeichnung</label>
+<input id="wartungFreitext" placeholder="z.B. Brenner komplett gereinigt" type="text">
+</input></div>
+<div>
+<label data-i18n="lbl_repair_details" for="wartungNotizen">Details / Bemerkungen</label>
+<textarea id="wartungNotizen" placeholder="Was wurde genau gemacht?"></textarea>
+</div>
+<button class="main" data-i18n="submit_repair" disabled="" id="wartungSpeichernBtn" onclick="wartungEintragen()" type="button">
+          🛠️ Wartung in System eintragen
+        </button>
+<div id="wartungStatus" style="font-size:16px; margin-top:8px;"></div>
+</div>
+</div>
+<button class="main" data-i18n="save_protocol" disabled="" id="speichernBtn" onclick="speichernProtokoll()" type="button">✅ Protokoll speichern</button>
+<div id="status"></div>
+</div>
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyBo-pt3krDP9c5AxojmWaHVqPkoqmupOvA",
       authDomain: "digitales-bordbuch.firebaseapp.com",
@@ -436,7 +544,39 @@
       setTimeout(() => input.focus(), 50);
     }
 
+    // ---------------- UI: Ausklappen/Einklappen ----------------
+    function bindToggle(btnId, sectionId, labelShow, labelHide, startOpen = false) {
+      const btn = document.getElementById(btnId);
+      const sec = document.getElementById(sectionId);
+      if (!btn || !sec) return;
 
+      btn.dataset.labelShow = labelShow;
+      btn.dataset.labelHide = labelHide;
+
+      const render = (open) => {
+        const arrow = open ? "▼" : "▶";
+        const show = btn.dataset.labelShow || labelShow;
+        const hide = btn.dataset.labelHide || labelHide;
+        btn.innerHTML = `<span class="arrow">${arrow}</span>${open ? hide : show}`;
+      };
+
+      const apply = (open) => {
+        sec.style.display = open ? "block" : "none";
+        btn.dataset.open = open ? "1" : "0";
+        render(open);
+      };
+
+      const inlineHidden = (sec.style && sec.style.display === "none");
+      const initialOpen = inlineHidden ? false : !!startOpen;
+      apply(initialOpen);
+
+      btn.addEventListener("click", () => {
+        const open = btn.dataset.open === "1";
+        apply(!open);
+      });
+    }
+
+    // ---------------- Basis-Inputs ----------------
     const stadtSelect = document.getElementById('stadtSelect');
     const centerSelect = document.getElementById('centerSelect');
     const automatSelect = document.getElementById('automatSelect');
@@ -445,180 +585,565 @@
     const speichernBtn = document.getElementById('speichernBtn');
     const statusDiv = document.getElementById('status');
 
+    const wartungsartSelect = document.getElementById('wartungsartSelect');
+    const wartungFreitextInput = document.getElementById('wartungFreitext');
+    const wartungNotizenInput = document.getElementById('wartungNotizen');
+    const wartungSpeichernBtn = document.getElementById('wartungSpeichernBtn');
+    const wartungStatusDiv = document.getElementById('wartungStatus');
+
+    const feldWeinrot = document.getElementById('feld_weinrot');
+    const feldGruen = document.getElementById('feld_gruen');
+    const btnApfel = document.getElementById('btn-apfel');
+    const btnKirsch = document.getElementById('btn-kirsch');
+
+    const toggleWochenwartungBtn = document.getElementById('toggleWochenwartungBtn');
+    const wochenwartungSection = document.getElementById('wochenwartungSection');
+    const toggleWartungBtn = document.getElementById('toggleWartungBtn');
+    const wartungSection = document.getElementById('wartungSection');
+
+    let wochenButton;
+    let wochenTaskContainer;
+    let wochenStatusDiv;
     let unsubscribeBestellungen = null;
 
     const heute = new Date().toISOString().split('T')[0];
     datumInput.value = heute;
 
-    function clearSelect(sel){ sel.innerHTML=''; }
-    function addOption(sel,text,val){ const o=document.createElement('option');o.textContent=text;o.value=val;sel.appendChild(o); }
+    function clearSelect(sel) { sel.innerHTML = ''; }
+    function addOption(sel, text, val) {
+      const o = document.createElement('option');
+      o.textContent = text;
+      o.value = val;
+      sel.appendChild(o);
+    }
 
-    async function ladeStaedte(){
-      clearSelect(stadtSelect); addOption(stadtSelect,'Wähle Stadt...','');
+    // Code normalisieren (Bindestriche entfernen) - wichtig für Firestore-Queries/Keys
+    function normalizeCode(code) {
+      if (!code) return "";
+      return String(code).replace(/-/g, "").trim();
+    }
+
+    async function ladeStaedte() {
+      clearSelect(stadtSelect);
+      addOption(stadtSelect, 'Wähle Stadt...', '');
+
       const snap = await db.collection('automaten').get();
       const set = new Set();
-      snap.forEach(d => { if(d.data().stadt) set.add(String(d.data().stadt).trim()); });
-            const allowed = getAllowedCitiesFromPinUser(window.pinUser);
-      const cities = Array.from(set).filter(s => !allowed || allowed.includes(s));
-      cities.sort().forEach(s => addOption(stadtSelect,s,s));
-Array.from(set).sort().forEach(s => addOption(stadtSelect,s,s));
-      stadtSelect.disabled=false; centerSelect.disabled=true; automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      pruefeFormular();
-    }
-
-    async function ladeCenter(stadt){
-      clearSelect(centerSelect); addOption(centerSelect,'Wähle Center...','');
-      centerSelect.disabled=true; automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      if(!stadt){ pruefeFormular(); return; }
-      const allowed = getAllowedCitiesFromPinUser(window.pinUser);
-      if (allowed && !allowed.includes(stadt)) { pruefeFormular(); return; }
-      const snap = await db.collection('automaten').where('stadt','==',stadt).get();
-      snap.forEach(doc => { const c=doc.data().center; if(c) addOption(centerSelect,String(c),String(c)); });
-      if(centerSelect.options.length>1) centerSelect.disabled=false;
-      pruefeFormular();
-    }
-
-    async function ladeAutomatenUndMitarbeiter(stadt,center){
-      clearSelect(automatSelect); addOption(automatSelect,'Wähle Automat...','');
-      clearSelect(mitarbeiterSelect); addOption(mitarbeiterSelect,'Mitarbeiter wählen...','');
-      automatSelect.disabled=true; mitarbeiterSelect.disabled=true;
-      if(!stadt || !center){ pruefeFormular(); return; }
-      const snap = await db.collection('automaten').where('stadt','==',stadt).where('center','==',center).get();
-      const pinName = window.pinUser && window.pinUser.name ? String(window.pinUser.name).trim() : "";
-      snap.forEach(doc=>{
-        const d=doc.data();
-        const code=(d.automatCode || d.Automat || '').toString().trim();
-        if(code) addOption(automatSelect,code,code);
+      snap.forEach(d => {
+        if (d.data().stadt) set.add(String(d.data().stadt).trim());
       });
 
+      const allowed = getAllowedCitiesFromPinUser(window.pinUser);
+      const cities = Array.from(set)
+        .filter(s => !allowed || allowed.includes(s))
+        .filter(Boolean);
+
+      cities.sort((a,b) => a.localeCompare(b, 'de')).forEach(s => addOption(stadtSelect, s, s));
+
+      stadtSelect.disabled = false;
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+      pruefeFormular();
+    }
+
+    async function ladeCenter(stadt) {
+      clearSelect(centerSelect);
+      addOption(centerSelect, 'Wähle Center...', '');
+      centerSelect.disabled = true;
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+
+      if (!stadt) {
+        pruefeFormular();
+        return;
+      }
+
+      const allowed = getAllowedCitiesFromPinUser(window.pinUser);
+      if (allowed && !allowed.includes(stadt)) {
+        pruefeFormular();
+        return;
+      }
+
+      const snap = await db.collection('automaten').where('stadt', '==', stadt).get();
+      const set = new Set();
+      snap.forEach(doc => {
+        const c = doc.data().center;
+        if (c) set.add(String(c));
+      });
+
+      Array.from(set).sort((a,b)=>a.localeCompare(b,'de')).forEach(c => addOption(centerSelect, c, c));
+      if (centerSelect.options.length > 1) centerSelect.disabled = false;
+
+      pruefeFormular();
+    }
+
+    async function ladeAutomatenUndMitarbeiter(stadt, center) {
+      clearSelect(automatSelect);
+      addOption(automatSelect, 'Wähle Automat...', '');
+      clearSelect(mitarbeiterSelect);
+      addOption(mitarbeiterSelect, 'Mitarbeiter wählen...', '');
+      automatSelect.disabled = true;
+      mitarbeiterSelect.disabled = true;
+
+      if (!stadt || !center) {
+        pruefeFormular();
+        return;
+      }
+
+      const allowed = getAllowedCitiesFromPinUser(window.pinUser);
+      if (allowed && !allowed.includes(stadt)) {
+        pruefeFormular();
+        return;
+      }
+
+      const snap = await db.collection('automaten')
+        .where('stadt', '==', stadt)
+        .where('center', '==', center)
+        .get();
+
+      // Automaten
+      const automatSet = new Set();
+      snap.forEach(doc => {
+        const d = doc.data();
+        const code = (d.automatCode || d.Automat || '').toString().trim();
+        if (code) automatSet.add(code);
+      });
+      Array.from(automatSet).sort((a,b)=>a.localeCompare(b,'de')).forEach(code => addOption(automatSelect, code, code));
+
       // Mitarbeiter: aus PIN ableiten (verhindert "Name faken")
+      const pinName = window.pinUser && window.pinUser.name ? String(window.pinUser.name).trim() : "";
       if (pinName) {
         addOption(mitarbeiterSelect, pinName, pinName);
       } else {
-        // Fallback: wenn kein Name im PIN-Dokument, dann wie früher aus Daten
         const mitSet = new Set();
-        snap.forEach(doc=>{
-          const d=doc.data();
-          if(d.mitarbeiter) mitSet.add(String(d.mitarbeiter).trim());
-          if(d.leitung) mitSet.add(String(d.leitung).trim());
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.mitarbeiter) mitSet.add(String(d.mitarbeiter).trim());
+          if (d.leitung) mitSet.add(String(d.leitung).trim());
         });
         mitSet.add('Klaus Schiemann');
         mitSet.add('Dirk Albrecht');
-        Array.from(mitSet).filter(Boolean).sort().forEach(m=>addOption(mitarbeiterSelect,m,m));
+        Array.from(mitSet).filter(Boolean).sort((a,b)=>a.localeCompare(b,'de')).forEach(m => addOption(mitarbeiterSelect, m, m));
       }
-      if(automatSelect.options.length>1) automatSelect.disabled=false;
-      if(mitarbeiterSelect.options.length>1) {
+
+      if (automatSelect.options.length > 1) automatSelect.disabled = false;
+
+      if (mitarbeiterSelect.options.length > 1) {
         mitarbeiterSelect.disabled = false;
         // auto-select first available
         if (!mitarbeiterSelect.value) mitarbeiterSelect.selectedIndex = 1;
+
         // wenn PIN-Name gesetzt, Auswahl sperren
-        const pinName = window.pinUser && window.pinUser.name ? String(window.pinUser.name).trim() : "";
-        if (pinName) mitarbeiterSelect.disabled = true;
+        if (pinName) {
+          mitarbeiterSelect.value = pinName;
+          mitarbeiterSelect.disabled = true;
+        }
       }
+
       pruefeFormular();
+      updateSonderZuckerFelder();
       ladeBestellungen();
+      ladeWochenwartung();
     }
 
-    function pruefeFormular(){
-      const ok = stadtSelect.value && centerSelect.value && automatSelect.value && mitarbeiterSelect.value && datumInput.value;
+    function pruefeFormular() {
+      const ok =
+        stadtSelect.value &&
+        centerSelect.value &&
+        automatSelect.value &&
+        mitarbeiterSelect.value &&
+        datumInput.value;
+
       speichernBtn.disabled = !ok;
+      if (wochenButton) wochenButton.disabled = !ok;
+      if (wartungSpeichernBtn) wartungSpeichernBtn.disabled = !ok;
     }
 
-    stadtSelect.addEventListener('change',()=>{ladeCenter(stadtSelect.value);});
-    centerSelect.addEventListener('change',()=>{ladeAutomatenUndMitarbeiter(stadtSelect.value,centerSelect.value);});
-    automatSelect.addEventListener('change',()=>{pruefeFormular();ladeBestellungen();});
-    mitarbeiterSelect.addEventListener('change',pruefeFormular);
-    datumInput.addEventListener('change',pruefeFormular);
+    function updateSonderZuckerFelder() {
+      const code = normalizeCode(automatSelect.value || '');
+      const sichtbar = code === 'CYJ1001014'; // Sonderautomat mit Grün/Weinrot
+      if (feldWeinrot) feldWeinrot.style.display = sichtbar ? 'flex' : 'none';
+      if (feldGruen) feldGruen.style.display = sichtbar ? 'flex' : 'none';
+      if (btnApfel) btnApfel.style.display = sichtbar ? 'block' : 'none';
+      if (btnKirsch) btnKirsch.style.display = sichtbar ? 'block' : 'none';
 
-    function setButtonState(id,on){
-      const b=document.getElementById(id);
-      if(!b)return;
-      on?b.classList.add('ordered'):b.classList.remove('ordered');
+      if (!sichtbar) {
+        const we = document.getElementById('zucker_weinrot');
+        const gr = document.getElementById('zucker_gruen');
+        if (we) we.value = '';
+        if (gr) gr.value = '';
+      }
     }
 
-    function ladeBestellungen(){
-      if(unsubscribeBestellungen){unsubscribeBestellungen();unsubscribeBestellungen=null;}
-      document.querySelectorAll('.order-btn').forEach(b=>b.classList.remove('ordered'));
-      const code = automatSelect.value || '';
-      if(!code) return;
-      const q = db.collection('bestellungen')
-        .where('automat','==',code)
-        .where('status','==','bestellt')
-        .orderBy('timestamp','desc');
-      unsubscribeBestellungen = q.onSnapshot(snap=>{
-        snap.forEach(doc=>{
-          const d=doc.data();
-          if(d.farbe) setButtonState('btn-'+d.farbe,true);
-          else if(d.typ==='Stäbe') setButtonState('btn-staebe',true);
+    stadtSelect.addEventListener('change', () => { ladeCenter(stadtSelect.value); });
+    centerSelect.addEventListener('change', () => { ladeAutomatenUndMitarbeiter(stadtSelect.value, centerSelect.value); });
+    automatSelect.addEventListener('change', () => {
+      pruefeFormular();
+      updateSonderZuckerFelder();
+      ladeBestellungen();
+      ladeWochenwartung();
+    });
+    mitarbeiterSelect.addEventListener('change', () => { pruefeFormular(); ladeWochenwartung(); });
+    datumInput.addEventListener('change', pruefeFormular);
+
+    // Ausklapp-UI (Punkte 2-5)
+    bindToggle("toggleAufgabenBtn", "aufgabenSection", "Ausklappen", "Einklappen", false);
+    bindToggle("toggleFunktionBtn", "funktionSection", "Ausklappen", "Einklappen", false);
+    bindToggle("toggleBestaendeBtn", "bestaendeSection", "Ausklappen", "Einklappen", false);
+    bindToggle("toggleBestellungenBtn", "bestellungenSection", "Ausklappen", "Einklappen", false);
+    // Ausklapp-UI (Punkte 2-7)
+    bindToggle("toggleWochenwartungBtn", "wochenwartungSection", "Wöchentliche Wartung anzeigen", "Wöchentliche Wartung verbergen", false);
+    bindToggle("toggleWartungBtn", "wartungSection", "Reparaturen anzeigen", "Reparaturen verbergen", false);
+
+
+    // ---------------- Bestellungen ----------------
+    function setButtonState(id, on) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      on ? b.classList.add('ordered') : b.classList.remove('ordered');
+    }
+
+    function ladeBestellungen() {
+      if (unsubscribeBestellungen) {
+        unsubscribeBestellungen();
+        unsubscribeBestellungen = null;
+      }
+
+      document.querySelectorAll('.order-btn').forEach(b => b.classList.remove('ordered'));
+
+      const code = normalizeCode(automatSelect.value || '');
+      if (!code) return;
+
+      const q = db
+        .collection('bestellungen')
+        .where('automat', '==', code)
+        .where('status', '==', 'bestellt')
+        .orderBy('timestamp', 'desc');
+
+      unsubscribeBestellungen = q.onSnapshot(snap => {
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.farbe) setButtonState('btn-' + d.farbe, true);
+          else if (d.typ === 'Stäbe') setButtonState('btn-staebe', true);
         });
       });
     }
 
-    window.toggleBestellung = async function(sorte){
-      const btnId='btn-'+sorte;
-      const btn=document.getElementById(btnId);
-      if(!btn || !automatSelect.value) return;
+    window.toggleBestellung = async function (sorte) {
+      const btnId = 'btn-' + sorte;
+      const btn = document.getElementById(btnId);
+      if (!btn || !automatSelect.value) return;
       const istBestellt = btn.classList.contains('ordered');
-      try{
+
+      try {
         const basis = {
-          farbe:sorte,
-          typ:'Zucker',
-          menge:'2 Tüten',
-          automat:automatSelect.value,
-          stadt:stadtSelect.value,
-          center:centerSelect.value,
-          mitarbeiter:mitarbeiterSelect.value,
-          timestamp:new Date()
+          farbe: sorte,
+          typ: 'Zucker',
+          menge: '2 Tüten',
+          automat: normalizeCode(automatSelect.value),
+          stadt: stadtSelect.value,
+          center: centerSelect.value,
+          mitarbeiter: mitarbeiterSelect.value,
+          timestamp: new Date()
         };
-        if(!istBestellt){
-          await db.collection('bestellungen').add({...basis,status:'bestellt'});
-          setButtonState(btnId,true);
-        }else{
-          await db.collection('bestellungen').add({...basis,status:'storniert'});
-          setButtonState(btnId,false);
+
+        if (!istBestellt) {
+          await db.collection('bestellungen').add({ ...basis, status: 'bestellt' });
+          setButtonState(btnId, true);
+        } else {
+          await db.collection('bestellungen').add({ ...basis, status: 'storniert' });
+          setButtonState(btnId, false);
         }
-      }catch(e){console.error(e);}
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    window.toggleStaebe = async function(){
-      const btnId='btn-staebe';
-      const btn=document.getElementById(btnId);
-      if(!btn || !automatSelect.value) return;
+    window.toggleStaebe = async function () {
+      const btnId = 'btn-staebe';
+      const btn = document.getElementById(btnId);
+      if (!btn || !automatSelect.value) return;
       const istBestellt = btn.classList.contains('ordered');
-      try{
+
+      try {
         const basis = {
-          typ:'Stäbe',
-          menge:'2 Pakete',
-          automat:automatSelect.value,
-          stadt:stadtSelect.value,
-          center:centerSelect.value,
-          mitarbeiter:mitarbeiterSelect.value,
-          timestamp:new Date()
+          typ: 'Stäbe',
+          menge: '2 Pakete',
+          automat: normalizeCode(automatSelect.value),
+          stadt: stadtSelect.value,
+          center: centerSelect.value,
+          mitarbeiter: mitarbeiterSelect.value,
+          timestamp: new Date()
         };
-        if(!istBestellt){
-          await db.collection('bestellungen').add({...basis,status:'bestellt',staebeBestellt:2});
-          setButtonState(btnId,true);
-        }else{
-          await db.collection('bestellungen').add({...basis,status:'storniert',staebeBestellt:-2});
-          setButtonState(btnId,false);
+
+        if (!istBestellt) {
+          await db.collection('bestellungen').add({ ...basis, status: 'bestellt', staebeBestellt: 2 });
+          setButtonState(btnId, true);
+        } else {
+          await db.collection('bestellungen').add({ ...basis, status: 'storniert', staebeBestellt: -2 });
+          setButtonState(btnId, false);
         }
-      }catch(e){console.error(e);}
+      } catch (e) {
+        console.error(e);
+      }
     };
 
-    async function speichernProtokoll(){
-      if(speichernBtn.disabled) return;
-      speichernBtn.disabled=true;
-      statusDiv.textContent='Speichere…';
-      statusDiv.className='';
-      try{
+    // ---------------- Wochenwartung ----------------
+    function getCurrentWeekKey() {
+      const d = new Date();
+      const year = d.getFullYear();
+      const oneJan = new Date(year, 0, 1);
+      const dayOfYear = Math.floor((d - oneJan) / 86400000) + 1;
+      const week = Math.ceil(dayOfYear / 7);
+      return `${year}-W${week.toString().padStart(2, '0')}`;
+    }
+
+    function initWochenwartungUI() {
+      wochenButton = document.getElementById('wochenwartungBtn');
+      wochenTaskContainer = document.getElementById('wochenwartungTasks');
+      wochenStatusDiv = document.getElementById('wochenwartungStatus');
+
+      if (wochenButton) {
+        wochenButton.addEventListener('click', () => {
+          ladeWochenwartung(true);
+        });
+      }
+      pruefeFormular();
+    }
+
+    async function ladeWochenwartung(openDialog = false) {
+      if (!automatSelect.value || !mitarbeiterSelect.value) {
+        if (wochenStatusDiv) wochenStatusDiv.textContent = '';
+        if (wochenTaskContainer) wochenTaskContainer.innerHTML = '';
+        return;
+      }
+
+      const weekKey = getCurrentWeekKey();
+      const automatCode = normalizeCode(automatSelect.value);
+
+      const q = await db
+        .collection('wochenWartung')
+        .where('automatCode', '==', automatCode)
+        .where('woche', '==', weekKey)
+        .limit(1)
+        .get();
+
+      let docRef = null;
+      let docData = null;
+
+      if (!q.empty) {
+        docRef = q.docs[0].ref;
+        docData = q.docs[0].data();
+      }
+
+      const today = new Date();
+      const isFriday = today.getDay() === 5;
+      if (wochenStatusDiv) {
+        if (docData && docData.status === 'erledigt') {
+          wochenStatusDiv.textContent = 'Wöchentliche Wartung: erledigt.';
+        } else if (isFriday) {
+          wochenStatusDiv.textContent = 'Hinweis: Morgen ist letzter Tag für die Wochenwartung.';
+        } else {
+          wochenStatusDiv.textContent = '';
+        }
+      }
+
+      if (!openDialog) return;
+
+      const elementsSnap = await db
+        .collection('Wartungselemente')
+        .where('typ', '==', 'Wochenwartung')
+        .get();
+
+      const taskMap = (docData && docData.tasks) || {};
+      if (wochenTaskContainer) wochenTaskContainer.innerHTML = '';
+
+      const tasks = [];
+
+      elementsSnap.forEach(elDoc => {
+        const d = elDoc.data();
+        const id = elDoc.id;
+        const label = d.bezeichnung || 'Wartung';
+        const key = 'ww_' + id;
+
+        const row = document.createElement('div');
+        row.className = 'task-row';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = key;
+        checkbox.checked = !!(taskMap[id] && taskMap[id].done);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'task-label';
+        lbl.textContent = label;
+
+        row.appendChild(checkbox);
+        row.appendChild(lbl);
+        wochenTaskContainer.appendChild(row);
+
+        tasks.push({ id, checkbox });
+      });
+
+      const saveBtn = document.createElement('button');
+      saveBtn.className = 'main';
+      saveBtn.textContent = '✅ Wochenwartung speichern';
+      saveBtn.style.marginTop = '16px';
+      saveBtn.type = 'button';
+
+      saveBtn.onclick = async () => {
+        const newTasks = {};
+        let allDone = true;
+
+        tasks.forEach(t => {
+          const done = t.checkbox.checked;
+          newTasks[t.id] = { done, doneAt: done ? new Date() : null };
+          if (!done) allDone = false;
+        });
+
+        const newStatus = allDone ? 'erledigt' : 'teilweise';
+
+        if (!docRef) {
+          const payload = {
+            automatCode,
+            woche: weekKey,
+            mitarbeiter: mitarbeiterSelect.value,
+            startedAt: new Date(),
+            tasks: newTasks,
+            status: newStatus
+          };
+          docRef = await db.collection('wochenWartung').add(payload);
+        } else {
+          await docRef.update({ tasks: newTasks, status: newStatus });
+        }
+
+        if (wochenStatusDiv) {
+          wochenStatusDiv.textContent =
+            newStatus === 'erledigt'
+              ? 'Wöchentliche Wartung: erledigt.'
+              : 'Wöchentliche Wartung: teilweise erledigt.';
+        }
+      };
+
+      wochenTaskContainer.appendChild(saveBtn);
+    }
+
+    // ---------------- Wartungselemente (Einzelwartung) ----------------
+    async function ladeWartungselemente() {
+      if (!wartungsartSelect) return;
+
+      wartungsartSelect.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.textContent = 'Wartung auswählen...';
+      placeholder.value = '';
+      wartungsartSelect.appendChild(placeholder);
+      wartungsartSelect.disabled = true;
+
+      const snap = await db
+        .collection('Wartungselemente')
+        .where('typ', '==', 'Checkheft')
+        .get();
+
+      const items = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        const label = d.bezeichnung || 'Wartung';
+        items.push({ id: doc.id, label });
+      });
+      items.sort((a, b) => a.label.localeCompare(b.label, 'de'));
+
+      items.forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.label;
+        opt.textContent = it.label;
+        wartungsartSelect.appendChild(opt);
+      });
+
+      wartungsartSelect.disabled = false;
+    }
+
+    async function wartungEintragen() {
+      if (!wartungSpeichernBtn || wartungSpeichernBtn.disabled) return;
+
+      const automatCode = normalizeCode(automatSelect.value);
+      const mitarbeiter = mitarbeiterSelect.value;
+      const datumStr = datumInput.value;
+
+      const ausListe = wartungsartSelect && wartungsartSelect.value
+        ? wartungsartSelect.value.trim()
+        : '';
+      const frei = wartungFreitextInput && wartungFreitextInput.value
+        ? wartungFreitextInput.value.trim()
+        : '';
+
+      const bezeichnung = ausListe || frei;
+
+      if (!bezeichnung) {
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent = 'Bitte Wartungsart auswählen oder eigene Bezeichnung eingeben.';
+          wartungStatusDiv.className = 'err';
+        }
+        return;
+      }
+
+      wartungSpeichernBtn.disabled = true;
+      if (wartungStatusDiv) {
+        wartungStatusDiv.textContent = 'Wartung wird gespeichert…';
+        wartungStatusDiv.className = '';
+      }
+
+      try {
+        const datumObj = datumStr ? new Date(datumStr) : new Date();
+        const datumAnzeige = datumObj.toLocaleDateString('de-DE');
+
+        const payload = {
+          automatCode,
+          bezeichnung,
+          datumDerDurchfuhrung: datumAnzeige,
+          name: mitarbeiter,
+          notizen: wartungNotizenInput ? wartungNotizenInput.value.trim() : '',
+          erstelltAm: new Date(),
+        };
+
+        await db.collection('Wartungsprotokolle').add(payload);
+
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent = '🛠️ Wartung im Wartungsprotokoll gespeichert.';
+          wartungStatusDiv.className = 'ok';
+        }
+
+        if (wartungFreitextInput) wartungFreitextInput.value = '';
+        if (wartungNotizenInput) wartungNotizenInput.value = '';
+      } catch (err) {
+        if (wartungStatusDiv) {
+          wartungStatusDiv.textContent = '❌ Fehler beim Speichern der Wartung: ' + err.message;
+          wartungStatusDiv.className = 'err';
+        }
+      } finally {
+        wartungSpeichernBtn.disabled = false;
+      }
+    }
+
+    window.wartungEintragen = wartungEintragen;
+
+    // ---------------- Protokoll speichern ----------------
+    async function speichernProtokoll() {
+      if (speichernBtn.disabled) return;
+
+      speichernBtn.disabled = true;
+      statusDiv.textContent = 'Speichere…';
+      statusDiv.className = '';
+
+      try {
         const data = {
-          automatCode: automatSelect.value,
+          automatCode: normalizeCode(automatSelect.value),
           stadt: stadtSelect.value,
           center: centerSelect.value,
           datum: new Date(datumInput.value),
           mitarbeiter: mitarbeiterSelect.value,
 
-          // Punkt 2 – Aufgaben
+          // Aufgaben
           zucker_aufgefuellt: document.getElementById('zucker').checked,
           wasser_aufgefuellt: document.getElementById('wasser').checked,
           staebe_aufgefuellt: document.getElementById('staebeAuf').checked,
@@ -636,44 +1161,333 @@ Array.from(set).sort().forEach(s => addOption(stadtSelect,s,s));
           brennerkopf_gereinigt: document.getElementById('brennerkopf').checked,
           duese_gereinigt: document.getElementById('duese').checked,
 
-          // Punkt 3 – Bestände
-          zucker_rot:   parseFloat(document.getElementById('zucker_rot').value)   || 0,
-          zucker_gelb:  parseFloat(document.getElementById('zucker_gelb').value)  || 0,
-          zucker_blau:  parseFloat(document.getElementById('zucker_blau').value)  || 0,
+          // Bestände
+          zucker_rot: parseFloat(document.getElementById('zucker_rot').value) || 0,
+          zucker_gelb: parseFloat(document.getElementById('zucker_gelb').value) || 0,
+          zucker_blau: parseFloat(document.getElementById('zucker_blau').value) || 0,
           zucker_weiss: parseFloat(document.getElementById('zucker_weiss').value) || 0,
-          zucker_weinrot:parseFloat(document.getElementById('zucker_weinrot').value)||0,
-          zucker_gruen: parseFloat(document.getElementById('zucker_gruen').value) || 0,
-          staebe:       parseFloat(document.getElementById('staebe').value)       || 0,
+          zucker_weinrot: parseFloat(document.getElementById('zucker_weinrot')?.value || 0) || 0,
+          zucker_gruen: parseFloat(document.getElementById('zucker_gruen')?.value || 0) || 0,
+          staebe: parseFloat(document.getElementById('staebe').value) || 0,
 
-          // Punkt 4 – Funktionsprüfung
-          befeuchtungstest:          document.getElementById('befeuchtung').checked,
-          reinigungstest:           document.getElementById('reinigungstest').checked,
-          neuer_stab_genommen:      document.getElementById('neuer_stab').checked,
-          roboterarm_90grad:        document.getElementById('roboterarm_90grad').checked,
-          kreditkartensystem_ok:    document.getElementById('kreditkarte_ok').checked,
-          geldschein_system_ok:     document.getElementById('geldschein_ok').checked,
-          material_im_system:       document.getElementById('material_eingetragen').checked,
+          // Funktionsprüfung
+          befeuchtungstest: document.getElementById('befeuchtung').checked,
+          reinigungstest: document.getElementById('reinigungstest').checked,
+          neuer_stab_genommen: document.getElementById('neuer_stab').checked,
+          roboterarm_90grad: document.getElementById('roboterarm_90grad').checked,
+          kreditkartensystem_ok: document.getElementById('kreditkarte_ok').checked,
+          geldschein_system_ok: document.getElementById('geldschein_ok').checked,
+          material_im_system: document.getElementById('material_eingetragen').checked,
 
           auffaelligkeiten: document.getElementById('auffaelligkeiten').value.trim(),
           erstelltAm: new Date()
         };
 
         await db.collection('reinigungen').add(data);
-        statusDiv.textContent='✅ Erfolgreich gespeichert';
-        statusDiv.className='ok';
-        setTimeout(()=>window.location.reload(),2000);
-      }catch(err){
-        statusDiv.textContent='❌ Fehler beim Speichern: '+err.message;
-        statusDiv.className='err';
-        speichernBtn.disabled=false;
+
+        statusDiv.textContent = '✅ Erfolgreich gespeichert';
+        statusDiv.className = 'ok';
+        setTimeout(() => window.location.reload(), 2000);
+      } catch (err) {
+        statusDiv.textContent = '❌ Fehler beim Speichern: ' + err.message;
+        statusDiv.className = 'err';
+        speichernBtn.disabled = false;
       }
     }
 
-    function startApp(){
+    window.speichernProtokoll = speichernProtokoll;
+
+    // ---------------- Start ----------------
+    function startApp() {
+      initWochenwartungUI();
       ladeStaedte();
+      ladeWartungselemente();
     }
 
     requirePinOrStart(startApp);
-  </script>
+  
+    // ---------------- i18n (Frontend-Sprachen) ----------------
+    const translations = {
+      de: {
+        title: "Reinigungsprotokoll Automaten",
+        subtitle: "Automatenservice Schiemann & Automatenservice Albrecht",
+        pin_required: "PIN erforderlich",
+        pin_prompt: "Bitte PIN eingeben, um fortzufahren.",
+        login: "Einloggen",
+
+        sec1: "1. Automat auswählen",
+        sec2: "2. Aufgaben pro Automat",
+        sec3: "3. Funktionsprüfung",
+        sec4: "4. Bestände pro Packung",
+        sec5: "5. Bestellungen",
+        sec6: "6. Wöchentliche Wartung",
+        sec7: "7. Reparaturen",
+
+        lbl_city: "Stadt",
+        lbl_center: "Center",
+        lbl_machine: "Automat",
+        lbl_date: "Datum",
+        lbl_staff: "Mitarbeiter / Leitung",
+        lbl_notes: "Auffälligkeiten",
+
+        lbl_sugar_red: "Roter Zucker",
+        lbl_sugar_yellow: "Gelber Zucker",
+        lbl_sugar_blue: "Blauer Zucker",
+        lbl_sugar_white: "Weißer Zucker",
+        lbl_sugar_winered: "Weinrot",
+        lbl_sugar_green: "Grün",
+        lbl_sticks: "Stäbe (Pakete)",
+
+        inv_red: "🍓 Rot (2 Tüten)",
+        inv_yellow: "🍭 Gelb (2 Tüten)",
+        inv_blue: "🫐 Blau (2 Tüten)",
+        inv_white: "🍭 Weiß (2 Tüten)",
+        inv_green: "🍏 Grün (2 Tüten)",
+        inv_winered: "🍒 Weinrot (2 Tüten)",
+        inv_sticks: "🧊 Stäbe (2 Pakete)",
+
+        toggle_generic_show: "Ausklappen",
+        toggle_generic_hide: "Einklappen",
+        toggle_weekly_show: "Wöchentliche Wartung anzeigen",
+        toggle_weekly_hide: "Wöchentliche Wartung verbergen",
+        toggle_repairs_show: "Reparaturen anzeigen",
+        toggle_repairs_hide: "Reparaturen verbergen",
+
+        open_weekly: "🛠️ Wöchentliche Wartung öffnen",
+        toggle_weekly: "Wöchentliche Wartung anzeigen",
+        toggle_repairs: "Reparaturen anzeigen",
+        submit_repair: "🛠️ Wartung in System eintragen",
+        save_protocol: "✅ Protokoll speichern",
+
+        lbl_repair_type_list: "Wartungsart (aus Liste)",
+        lbl_repair_type_custom: "oder eigene Bezeichnung",
+        lbl_repair_details: "Details / Bemerkungen"
+      },
+      en: {
+        title: "Cleaning log – machines",
+        subtitle: "Schiemann Vending Service & Albrecht Vending Service",
+        pin_required: "PIN required",
+        pin_prompt: "Please enter the PIN to continue.",
+        login: "Log in",
+
+        sec1: "1. Select machine",
+        sec2: "2. Tasks per machine",
+        sec3: "3. Function check",
+        sec4: "4. Stock per pack",
+        sec5: "5. Orders",
+        sec6: "6. Weekly maintenance",
+        sec7: "7. Repairs",
+
+        lbl_city: "City",
+        lbl_center: "Center",
+        lbl_machine: "Machine",
+        lbl_date: "Date",
+        lbl_staff: "Employee / Manager",
+        lbl_notes: "Notes / issues",
+
+        lbl_sugar_red: "Red sugar",
+        lbl_sugar_yellow: "Yellow sugar",
+        lbl_sugar_blue: "Blue sugar",
+        lbl_sugar_white: "White sugar",
+        lbl_sugar_winered: "Wine red",
+        lbl_sugar_green: "Green",
+        lbl_sticks: "Sticks (packs)",
+
+        inv_red: "🍓 Red (2 bags)",
+        inv_yellow: "🍭 Yellow (2 bags)",
+        inv_blue: "🫐 Blue (2 bags)",
+        inv_white: "🍭 White (2 bags)",
+        inv_green: "🍏 Green (2 bags)",
+        inv_winered: "🍒 Wine red (2 bags)",
+        inv_sticks: "🧊 Sticks (2 packs)",
+
+        toggle_generic_show: "Expand",
+        toggle_generic_hide: "Collapse",
+        toggle_weekly_show: "Show weekly maintenance",
+        toggle_weekly_hide: "Hide weekly maintenance",
+        toggle_repairs_show: "Show repairs",
+        toggle_repairs_hide: "Hide repairs",
+
+        open_weekly: "🛠️ Open weekly maintenance",
+        toggle_weekly: "Show weekly maintenance",
+        toggle_repairs: "Show repairs",
+        submit_repair: "🛠️ Submit maintenance",
+        save_protocol: "✅ Save protocol",
+
+        lbl_repair_type_list: "Maintenance type (from list)",
+        lbl_repair_type_custom: "or custom name",
+        lbl_repair_details: "Details / remarks"
+      },
+      tr: {
+        title: "Temizlik kayıt formu – makineler",
+        subtitle: "Schiemann Otomat Servisi & Albrecht Otomat Servisi",
+        pin_required: "PIN gerekli",
+        pin_prompt: "Devam etmek için lütfen PIN girin.",
+        login: "Giriş",
+
+        sec1: "1. Makine seç",
+        sec2: "2. Makine başına görevler",
+        sec3: "3. Fonksiyon kontrolü",
+        sec4: "4. Paket başına stok",
+        sec5: "5. Siparişler",
+        sec6: "6. Haftalık bakım",
+        sec7: "7. Onarımlar",
+
+        lbl_city: "Şehir",
+        lbl_center: "Merkez",
+        lbl_machine: "Makine",
+        lbl_date: "Tarih",
+        lbl_staff: "Çalışan / Sorumlu",
+        lbl_notes: "Notlar / sorunlar",
+
+        lbl_sugar_red: "Kırmızı şeker",
+        lbl_sugar_yellow: "Sarı şeker",
+        lbl_sugar_blue: "Mavi şeker",
+        lbl_sugar_white: "Beyaz şeker",
+        lbl_sugar_winered: "Bordo",
+        lbl_sugar_green: "Yeşil",
+        lbl_sticks: "Çubuklar (paket)",
+
+        inv_red: "🍓 Kırmızı (2 poşet)",
+        inv_yellow: "🍭 Sarı (2 poşet)",
+        inv_blue: "🫐 Mavi (2 poşet)",
+        inv_white: "🍭 Beyaz (2 poşet)",
+        inv_green: "🍏 Yeşil (2 poşet)",
+        inv_winered: "🍒 Bordo (2 poşet)",
+        inv_sticks: "🧊 Çubuk (2 paket)",
+
+        toggle_generic_show: "Aç",
+        toggle_generic_hide: "Kapat",
+        toggle_weekly_show: "Haftalık bakımı göster",
+        toggle_weekly_hide: "Haftalık bakımı gizle",
+        toggle_repairs_show: "Onarımları göster",
+        toggle_repairs_hide: "Onarımları gizle",
+
+        open_weekly: "🛠️ Haftalık bakımı aç",
+        toggle_weekly: "Haftalık bakımı göster",
+        toggle_repairs: "Onarımları göster",
+        submit_repair: "🛠️ Bakımı kaydet",
+        save_protocol: "✅ Protokolü kaydet",
+
+        lbl_repair_type_list: "Bakım türü (listeden)",
+        lbl_repair_type_custom: "veya özel ad",
+        lbl_repair_details: "Detaylar / notlar"
+      },
+      ar: {
+        title: "سجل تنظيف الأجهزة",
+        subtitle: "خدمة آلات شييمان وخدمة آلات ألبرخت",
+        pin_required: "مطلوب رقم PIN",
+        pin_prompt: "يرجى إدخال رقم PIN للمتابعة.",
+        login: "تسجيل الدخول",
+
+        sec1: "١. اختيار الجهاز",
+        sec2: "٢. مهام لكل جهاز",
+        sec3: "٣. فحص الوظائف",
+        sec4: "٤. المخزون لكل عبوة",
+        sec5: "٥. الطلبات",
+        sec6: "٦. الصيانة الأسبوعية",
+        sec7: "٧. الإصلاحات",
+
+        lbl_city: "المدينة",
+        lbl_center: "المركز",
+        lbl_machine: "الجهاز",
+        lbl_date: "التاريخ",
+        lbl_staff: "الموظف / المسؤول",
+        lbl_notes: "ملاحظات / مشاكل",
+
+        lbl_sugar_red: "سكر أحمر",
+        lbl_sugar_yellow: "سكر أصفر",
+        lbl_sugar_blue: "سكر أزرق",
+        lbl_sugar_white: "سكر أبيض",
+        lbl_sugar_winered: "أحمر خمري",
+        lbl_sugar_green: "أخضر",
+        lbl_sticks: "أعواد (حزم)",
+
+        inv_red: "🍓 أحمر (كيسان)",
+        inv_yellow: "🍭 أصفر (كيسان)",
+        inv_blue: "🫐 أزرق (كيسان)",
+        inv_white: "🍭 أبيض (كيسان)",
+        inv_green: "🍏 أخضر (كيسان)",
+        inv_winered: "🍒 خمري (كيسان)",
+        inv_sticks: "🧊 أعواد (حزمتان)",
+
+        toggle_generic_show: "إظهار",
+        toggle_generic_hide: "إخفاء",
+        toggle_weekly_show: "إظهار الصيانة الأسبوعية",
+        toggle_weekly_hide: "إخفاء الصيانة الأسبوعية",
+        toggle_repairs_show: "إظهار الإصلاحات",
+        toggle_repairs_hide: "إخفاء الإصلاحات",
+
+        open_weekly: "🛠️ فتح الصيانة الأسبوعية",
+        toggle_weekly: "إظهار الصيانة الأسبوعية",
+        toggle_repairs: "إظهار الإصلاحات",
+        submit_repair: "🛠️ تسجيل الصيانة",
+        save_protocol: "✅ حفظ السجل",
+
+        lbl_repair_type_list: "نوع الصيانة (من القائمة)",
+        lbl_repair_type_custom: "أو اسم مخصص",
+        lbl_repair_details: "تفاصيل / ملاحظات"
+      }
+    };
+
+    function applyTranslations(lang) {
+      const t = translations[lang] || translations.de;
+
+      // html lang + dir
+      document.documentElement.lang = lang;
+      document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+
+      // text nodes
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (t[key] == null) return;
+
+        // IMPORTANT: don't destroy UI by overwriting containers that include inputs/buttons/etc.
+        // Only replace pure text nodes (no child elements), or explicit safe elements.
+        const safeTags = new Set(["H1","H2","H3","H4","P","SPAN","LABEL","OPTION","LEGEND"]);
+        const tag = el.tagName || "";
+        if (el.children && el.children.length > 0 && !safeTags.has(tag)) return;
+
+        el.textContent = t[key];
+      });
+
+      // update toggle labels (keep current open state)
+      const updateToggle = (btnId, showKey, hideKey) => {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        btn.dataset.labelShow = t[showKey];
+        btn.dataset.labelHide = t[hideKey];
+        const open = btn.dataset.open === "1";
+        const arrow = open ? "▼" : "▶";
+        btn.innerHTML = `<span class="arrow">${arrow}</span>${open ? btn.dataset.labelHide : btn.dataset.labelShow}`;
+      };
+
+      updateToggle("toggleAufgabenBtn", "toggle_generic_show", "toggle_generic_hide");
+      updateToggle("toggleFunktionBtn", "toggle_generic_show", "toggle_generic_hide");
+      updateToggle("toggleBestaendeBtn", "toggle_generic_show", "toggle_generic_hide");
+      updateToggle("toggleBestellungenBtn", "toggle_generic_show", "toggle_generic_hide");
+      updateToggle("toggleWochenwartungBtn", "toggle_weekly_show", "toggle_weekly_hide");
+      updateToggle("toggleWartungBtn", "toggle_repairs_show", "toggle_repairs_hide");
+
+      // Buttons that still use textContent via data-i18n already handled above.
+      // Mark active button
+      document.querySelectorAll(".lang-btn").forEach(b => {
+        b.classList.toggle("active", b.dataset.lang === lang);
+      });
+
+      localStorage.setItem("app_lang", lang);
+    }
+
+    function initLanguageSwitcher() {
+      document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => applyTranslations(btn.dataset.lang));
+      });
+
+      const saved = localStorage.getItem("app_lang") || "de";
+      applyTranslations(saved);
+    }
+
+    initLanguageSwitcher();
+</script>
 </body>
 </html>
