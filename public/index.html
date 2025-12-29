@@ -7,6 +7,8 @@
 <title>Reinigungsprotokoll Automaten</title>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-functions-compat.js"></script>
 <style>
     :root {
       --bg-top: #e3f2fd;
@@ -456,7 +458,11 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    
+    const auth = firebase.auth();
+    const functions = firebase.app().functions("europe-west3");
+    const verifyPinCallable = functions.httpsCallable("verifyPin");
+const db = firebase.firestore();
 
     // ---------------- PIN Gate ----------------
     // Zwingt immer zur PIN-Eingabe (für live Betrieb empfohlen)
@@ -508,18 +514,32 @@
         document.getElementById("pinError").style.display = "none";
 
         try {
-          // pins: Docs haben Felder { name, pin, ... optional staedte }
-          const snap = await Promise.race([
-            db.collection("pins").where("pin", "==", pin).limit(1).get(),
+          // PIN-Check läuft serverseitig über Cloud Function (sicher, Rules werden nicht umgangen)
+          // 1) Erst anonym anmelden (damit wir eine uid haben)
+          if (!auth.currentUser) {
+            await Promise.race([
+              auth.signInAnonymously(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
+            ]);
+          }
+
+          // 2) PIN serverseitig prüfen -> Custom Token mit Claim {pin_ok:true}
+          const res = await Promise.race([
+            verifyPinCallable({ pin }),
             new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
           ]);
-          if (snap.empty) {
-            showPinError(tKey("pin_wrong","PIN falsch."));
+
+          const data = res && res.data ? res.data : {};
+          if (!data.token) {
+            showPinError(tKey("pin_error_prefix","Fehler beim PIN-Check: ") + "Kein Token erhalten.");
             return;
           }
 
-          const doc = snap.docs[0];
-          const user = { id: doc.id, ...doc.data() };
+          // 3) Mit Token einloggen (setzt pin_ok Claim in auth.token)
+          await auth.signInWithCustomToken(String(data.token));
+
+          const user = (data.user && typeof data.user === "object") ? data.user : {};
+
           window.pinUser = user;
 
           localStorage.setItem("pinAuth", JSON.stringify({
