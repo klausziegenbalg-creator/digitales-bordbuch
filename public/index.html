@@ -538,6 +538,11 @@ const db = firebase.firestore();
           // 3) Mit Token einloggen (setzt pin_ok Claim in auth.token)
           await auth.signInWithCustomToken(String(data.token));
 
+          // 🔐 WICHTIG: Claims (pin_ok) sofort aktualisieren, damit Firestore Rules sicher greifen
+          const u = auth.currentUser;
+          if (u) await u.getIdToken(true);
+          await new Promise(r => setTimeout(r, 150));
+
           const user = (data.user && typeof data.user === "object") ? data.user : {};
 
           window.pinUser = user;
