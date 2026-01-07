@@ -1,114 +1,99 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PIN – Reinigungsdienst</title>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <style>
-    body { font-family: Arial, sans-serif; background:#f5f5f5; margin:0; padding:20px; }
-    h1 { margin-top:0; }
-    .card { background:#fff; padding:16px; border-radius:6px; margin-bottom:16px; }
-    button { padding:10px 14px; cursor:pointer; }
-    select, input { padding:6px; margin:4px 0; width:100%; }
-    .error { color:#b00020; }
-    .ok { color:#006400; }
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reinigungsprotokoll Automaten</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .col { flex: 1 1 220px; min-width: 220px; }
+    label { display: block; font-weight: bold; margin: 10px 0 4px; }
+    select, input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { padding: 10px 14px; cursor: pointer; margin-top: 10px; }
+    .card { border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-top: 14px; }
+    .muted { color: #666; font-size: 12px; }
+    .error { color: #b00020; font-weight: bold; }
+    .ok { color: #006400; font-weight: bold; }
+    .hidden { display: none; }
+    .tasks { display: grid; gap: 8px; margin-top: 8px; }
+    .task { display: flex; align-items: center; gap: 8px; }
+    .task input[type="checkbox"]{ transform: scale(1.1); }
   </style>
 </head>
 <body>
-
-<h1>PIN – Wochenwartung</h1>
-
+<div class="container">
+<h1>Reinigungsprotokoll Automaten</h1>
 <div class="card">
-  <label>Automat</label>
-  <select id="automatSelect"></select>
-
-  <label>Stadt</label>
-  <select id="stadtSelect"></select>
-
-  <label>Center</label>
-  <select id="centerSelect"></select>
-
-  <label>Mitarbeiter</label>
-  <input id="mitarbeiterInput" />
-
-  <button id="openWochenwartungBtn">Wochenwartung öffnen</button>
-  <div id="status"></div>
+<div class="row">
+<div class="col">
+<label for="pinInput">PIN</label>
+<input id="pinInput" inputmode="numeric" placeholder="PIN eingeben" type="password"/>
+<button id="pinBtn">PIN prüfen</button>
+<div class="muted">Hinweis: PIN wird serverseitig geprüft.</div>
+</div>
+<div class="col">
+<label>Status</label>
+<div class="muted" id="authStatus">Nicht angemeldet</div>
+<div class="error hidden" id="authError"></div>
+</div>
+</div>
 </div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "DEIN_API_KEY",
-    authDomain: "DEIN_AUTH_DOMAIN",
-    projectId: "DEIN_PROJECT_ID"
-  };
+<div class="card hidden" id="appCard">
+<h2>Erfassung</h2>
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+<div class="row">
+<div class="col">
+<label for="stadtSelect">Stadt</label>
+<select id="stadtSelect"></select>
+</div>
+<div class="col">
+<label for="centerSelect">Center</label>
+<select id="centerSelect"></select>
+</div>
+<div class="col">
+<label for="automatSelect">Automat</label>
+<select id="automatSelect"></select>
+</div>
+</div>
 
-  auth.signInAnonymously();
+<div class="row">
+<div class="col">
+<label for="mitarbeiterSelect">Mitarbeiter</label>
+<select id="mitarbeiterSelect"></select>
+</div>
+<div class="col">
+<label for="datumInput">Datum</label>
+<input id="datumInput" type="date"/>
+</div>
+<div class="col">
+<label for="uhrzeitInput">Uhrzeit</label>
+<input id="uhrzeitInput" type="time"/>
+</div>
+</div>
 
-  function weekKey(date = new Date()) {
-    const oneJan = new Date(date.getFullYear(), 0, 1);
-    const week = Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
-    return `${date.getFullYear()}-KW${week}`;
-  }
+<div class="row">
+<div class="col">
+<label for="bemerkungInput">Bemerkung</label>
+<textarea id="bemerkungInput" rows="3"></textarea>
+</div>
+</div>
 
-  const statusEl = document.getElementById("status");
+<button id="saveBtn">Reinigung speichern</button>
+<div class="ok hidden" id="saveOk"></div>
+<div class="error hidden" id="saveErr"></div>
 
-  document.getElementById("openWochenwartungBtn").addEventListener("click", async () => {
-    statusEl.textContent = "";
-    statusEl.className = "";
+<hr style="margin:18px 0;"/>
 
-    try {
-      const automatCode = document.getElementById("automatSelect").value;
-      const stadt = document.getElementById("stadtSelect").value;
-      const center = document.getElementById("centerSelect").value;
-      const mitarbeiter = document.getElementById("mitarbeiterInput").value;
-
-      if (!automatCode || !stadt) {
-        statusEl.textContent = "Automat und Stadt sind Pflichtfelder.";
-        statusEl.className = "error";
-        return;
-      }
-
-      const kw = weekKey();
-
-      const q = db.collection("wochenWartung")
-        .where("automatCode", "==", automatCode)
-        .where("woche", "==", kw);
-
-      const snap = await q.get();
-
-      if (snap.empty) {
-        await db.collection("wochenWartung").add({
-          automatCode,
-          woche: kw,
-          stadt,          // 🔧 FIX
-          center,         // 🔧 FIX
-          mitarbeiter,
-          startedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          status: "offen",
-          tasks: []
-        });
-        statusEl.textContent = "Wochenwartung neu angelegt.";
-        statusEl.className = "ok";
-      } else {
-        statusEl.textContent = "Wochenwartung geöffnet.";
-        statusEl.className = "ok";
-      }
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = err.message;
-      statusEl.className = "error";
-    }
-  });
-</script>
-
-</body>
-</html>
+<h2>Wochenwartung</h2>
+<div class="row">
+<div class="col">
+<label>Kalenderwoche</label>
+<div class="muted" id="kwLabel">-</div>
+</div>
