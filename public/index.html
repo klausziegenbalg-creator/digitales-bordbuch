@@ -2,9 +2,6 @@
 
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PIN – Reinigungsdienst / Wochenwartung</title>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Reinigungsprotokoll Automaten</title>
@@ -24,30 +21,10 @@
       --text-main: #212121;
     }
 
-  <!-- Firebase (Compat für bestehende Logik) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     * { box-sizing: border-box; }
 
-  <style>
-body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-margin: 0;
-      padding: 20px;
-    }
-    h1 { margin-top: 0; }
-    .card {
-      background: #fff;
-      padding: 16px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.1);
-    }
-    label { display: block; margin-top: 10px; }
-    select, input {
-      padding: 6px;
+    body {
+      margin: 0;
       padding: 20px 10px 46px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-main) 40%, #ffffff 100%);
@@ -107,7 +84,7 @@ margin: 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
-margin-top: 4px;
+      margin-top: 4px;
     }
 
     label {
@@ -118,7 +95,7 @@ margin-top: 4px;
     }
 
     select, input[type="date"], input[type="number"], textarea, input[type="text"] {
-width: 100%;
+      width: 100%;
       padding: 14px 15px;
       margin: 2px 0 0;
       border-radius: 12px;
@@ -193,10 +170,7 @@ width: 100%;
     .order-btn.ordered {
       background: var(--accent);
       box-shadow: 0 3px 6px rgba(30, 136, 229, 0.4);
-}
-    button {
-      margin-top: 14px;
-      padding: 10px 14px;
+    }
 
     button.main {
       display: inline-flex;
@@ -230,7 +204,7 @@ width: 100%;
       font-size: 14px;
       border-radius: 999px;
       border: 0;
-cursor: pointer;
+      cursor: pointer;
       background: var(--accent-soft);
       color: var(--accent-strong);
       font-weight: 700;
@@ -271,10 +245,7 @@ cursor: pointer;
       background:#1976d2;
       color:#fff;
       border-color:#1976d2;
-}
-    .error { color: #b00020; margin-top: 10px; }
-    .ok { color: #006400; margin-top: 10px; }
-  </style>
+    }
     .lang-switch--pin{
       justify-content:center;
       margin-top:14px;
@@ -521,13 +492,9 @@ const db = firebase.firestore();
       return null;
     }
 
-<h1>PIN – Wochenwartung</h1>
     async function requirePinOrStart(startAppFn) {
       const cached = JSON.parse(localStorage.getItem("pinAuth") || "null");
 
-<div class="card">
-  <label>Automat</label>
-  <select id="automatSelect"></select>
       if (!ALWAYS_REQUIRE_PIN && cached?.ok && cached?.until > Date.now()) {
         window.pinUser = cached.user || null;
         hidePinGate();
@@ -535,24 +502,17 @@ const db = firebase.firestore();
         return;
       }
 
-  <label>Stadt</label>
-  <select id="stadtSelect"></select>
       const btn = document.getElementById("pinBtn");
       const input = document.getElementById("pinInput");
 
-  <label>Center</label>
-  <select id="centerSelect"></select>
       const attempt = async () => {
         const pin = (input.value || "").trim();
         if (!pin) return showPinError(tKey("pin_enter","Bitte PIN eingeben."));
 
-  <label>Mitarbeiter</label>
-  <input id="mitarbeiterInput" />
         btn.disabled = true;
         btn.textContent = tKey("pin_checking","Prüfe…");
         document.getElementById("pinError").style.display = "none";
 
-  <button id="openWochenwartungBtn">Wochenwartung öffnen</button>
         try {
           // PIN-Check läuft serverseitig über Cloud Function (sicher, Rules werden nicht umgangen)
           // 1) Erst anonym anmelden (damit wir eine uid haben)
@@ -563,64 +523,12 @@ const db = firebase.firestore();
             ]);
           }
 
-  <div id="status"></div>
-</div>
           // 2) PIN serverseitig prüfen -> Custom Token mit Claim {pin_ok:true}
           const res = await Promise.race([
             verifyPinCallable({ pin }),
             new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
           ]);
 
-<script>
-  /* =========================
-     Firebase Initialisierung
-  ========================= */
-
-  const firebaseConfig = {
-    apiKey: "DEIN_API_KEY",
-    authDomain: "DEIN_AUTH_DOMAIN",
-    projectId: "DEIN_PROJECT_ID"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // PIN-Session (anonym + Custom Claims pin_ok)
-  auth.signInAnonymously();
-
-  /* =========================
-     Hilfsfunktionen
-  ========================= */
-
-  function weekKey(date = new Date()) {
-    const oneJan = new Date(date.getFullYear(), 0, 1);
-    const week = Math.ceil(
-      (((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7
-    );
-    return `${date.getFullYear()}-KW${week}`;
-  }
-
-  const statusEl = document.getElementById("status");
-
-  /* =========================
-     Wochenwartung öffnen
-  ========================= */
-
-  document.getElementById("openWochenwartungBtn").addEventListener("click", async () => {
-    statusEl.textContent = "";
-    statusEl.className = "";
-
-    try {
-      const automatCode = document.getElementById("automatSelect").value;
-      const stadt = document.getElementById("stadtSelect").value;
-      const center = document.getElementById("centerSelect").value;
-      const mitarbeiter = document.getElementById("mitarbeiterInput").value;
-
-      if (!automatCode || !stadt) {
-        statusEl.textContent = "Automat und Stadt sind Pflichtfelder.";
-        statusEl.className = "error";
           const data = res && res.data ? res.data : {};
           if (!data.token) {
             showPinError(tKey("pin_error_prefix","Fehler beim PIN-Check: ") + "Kein Token erhalten.");
@@ -798,10 +706,9 @@ const db = firebase.firestore();
       const allowed = getAllowedCitiesFromPinUser(window.pinUser);
       if (allowed && !allowed.includes(stadt)) {
         pruefeFormular();
-return;
-}
+        return;
+      }
 
-      const kw = weekKey();
       const snap = await db.collection('automaten').where('stadt', '==', stadt).get();
       const set = new Set();
       snap.forEach(doc => {
@@ -809,28 +716,12 @@ return;
         if (c) set.add(String(c));
       });
 
-      // 🔑 WICHTIG: READ auf wochenWartung (braucht hasPinSession in Rules)
-      const queryRef = db.collection("wochenWartung")
-        .where("automatCode", "==", automatCode)
-        .where("woche", "==", kw);
       Array.from(set).sort((a,b)=>a.localeCompare(b,'de')).forEach(c => addOption(centerSelect, c, c));
       if (centerSelect.options.length > 1) centerSelect.disabled = false;
 
-      const snap = await queryRef.get();
       pruefeFormular();
     }
 
-      if (snap.empty) {
-        await db.collection("wochenWartung").add({
-          automatCode,
-          woche: kw,
-          stadt,
-          center,
-          mitarbeiter,
-          startedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          status: "offen",
-          tasks: []
-        });
     async function ladeAutomatenUndMitarbeiter(stadt, center) {
       clearSelect(automatSelect);
       addOption(automatSelect, 'Wähle Automat...', '');
@@ -839,8 +730,6 @@ return;
       automatSelect.disabled = true;
       mitarbeiterSelect.disabled = true;
 
-        statusEl.textContent = "Wochenwartung neu angelegt.";
-        statusEl.className = "ok";
       if (!stadt || !center) {
         pruefeFormular();
         return;
@@ -870,9 +759,7 @@ return;
       const pinName = window.pinUser && window.pinUser.name ? String(window.pinUser.name).trim() : "";
       if (pinName) {
         addOption(mitarbeiterSelect, pinName, pinName);
-} else {
-        statusEl.textContent = "Wochenwartung geöffnet.";
-        statusEl.className = "ok";
+      } else {
         const mitSet = new Set();
         snap.forEach(doc => {
           const d = doc.data();
@@ -896,19 +783,13 @@ return;
           mitarbeiterSelect.value = pinName;
           mitarbeiterSelect.disabled = true;
         }
-}
+      }
 
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = err.message || "Fehler beim Öffnen der Wochenwartung";
-      statusEl.className = "error";
       pruefeFormular();
       updateSonderZuckerFelder();
       ladeBestellungen();
       ladeWochenwartung();
-}
-  });
-</script>
+    }
 
     function pruefeFormular() {
       const ok =
