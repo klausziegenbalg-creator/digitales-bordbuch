@@ -7,7 +7,7 @@
 <title>Reinigungsprotokoll Automaten</title>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+<!-- firebase-auth-compat.js wurde entfernt (einfache PIN-Prüfung ohne Auth) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-functions-compat.js"></script>
 <style>
     :root {
@@ -339,9 +339,9 @@
 <div class="task-row"><input id="befeuchtung" type="checkbox"/><div class="task-label" data-i18n="chk_befeuchtung">Befeuchtungstest</div></div>
 <div class="task-row"><input id="reinigungstest" type="checkbox"/><div class="task-label" data-i18n="chk_reinigungstest">Reinigungstest</div></div>
 <div class="task-row"><input id="neuer_stab" type="checkbox"/><div class="task-label" data-i18n="chk_neuer_stab">Neuen Stab genommen</div></div>
-<div class="task-row"><input id="roboterarm_90grad" type="checkbox"/><div class="task-label" data-i18n="chk_roboterarm_90grad">Roboterarm im 90°‑Winkel</div></div>
+<div class="task-row"><input id="roboterarm_90grad" type="checkbox"/><div class="task-label" data-i18n="chk_roboterarm_90grad">Roboterarm im 90°-Winkel</div></div>
 <div class="task-row"><input id="kreditkarte_ok" type="checkbox"/><div class="task-label" data-i18n="chk_kreditkarte_ok">Kreditkartensystem OK</div></div>
-<div class="task-row"><input id="geldschein_ok" type="checkbox"/><div class="task-label" data-i18n="chk_geldschein_ok">Geldschein‑System OK</div></div>
+<div class="task-row"><input id="geldschein_ok" type="checkbox"/><div class="task-label" data-i18n="chk_geldschein_ok">Geldschein-System OK</div></div>
 <div class="task-row"><input id="material_eingetragen" type="checkbox"/><div class="task-label" data-i18n="chk_material_eingetragen">Material im System eingetragen</div></div>
 </div>
 <div style="margin-top:12px;">
@@ -407,7 +407,7 @@
         </button>
 </div>
 <div class="field-group" id="wochenwartungSection" style="display:none;">
-<div class="section-badge">7‑Tage‑Zeitraum</div>
+<div class="section-badge">7-Tage-Zeitraum</div>
 <button class="main" data-i18n="open_weekly" disabled="" id="wochenwartungBtn" type="button">🛠️ Wöchentliche Wartung öffnen</button>
 <div id="wochenwartungStatus" style="font-size:16px; margin-top:8px;"></div>
 <div class="task-list" id="wochenwartungTasks" style="margin-top:8px;"></div>
@@ -458,11 +458,10 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    
-    const auth = firebase.auth();
+
     const functions = firebase.app().functions("europe-west3");
     const verifyPinCallable = functions.httpsCallable("verifyPin");
-const db = firebase.firestore();
+    const db = firebase.firestore();
 
     // ---------------- PIN Gate ----------------
     // Zwingt immer zur PIN-Eingabe (für live Betrieb empfohlen)
@@ -514,48 +513,25 @@ const db = firebase.firestore();
         document.getElementById("pinError").style.display = "none";
 
         try {
-          // PIN-Check läuft serverseitig über Cloud Function (sicher, Rules werden nicht umgangen)
-          // 1) Erst anonym anmelden (damit wir eine uid haben)
-          if (!auth.currentUser) {
-            await Promise.race([
-              auth.signInAnonymously(),
-              new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
-            ]);
-          }
-
-          // 2) PIN serverseitig prüfen -> Custom Token mit Claim {pin_ok:true}
+          // ✅ EINFACHE PIN-PRÜFUNG: keine Auth, kein Token
           const res = await Promise.race([
             verifyPinCallable({ pin }),
             new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))
           ]);
 
-          const data = res && res.data ? res.data : {};
-          if (!data.token) {
-            showPinError(tKey("pin_error_prefix","Fehler beim PIN-Check: ") + "Kein Token erhalten.");
+          const data = (res && res.data) ? res.data : {};
+
+          if (!data.ok) {
+            showPinError(tKey("pin_wrong","PIN falsch."));
             return;
           }
 
-          // 3) Mit Token einloggen (setzt pin_ok Claim in auth.token)
-          await auth.signInWithCustomToken(String(data.token));
-
-          // 🔐 WICHTIG: Nach signInWithCustomToken kann auth.currentUser kurz "hinterherhinken".
-          // Wir warten daher auf den Auth-State und erzwingen dann einen Token-Refresh, damit pin_ok sofort in den Rules ankommt.
-          await new Promise((resolve, reject) => {
-            const unsub = auth.onAuthStateChanged((u) => {
-              if (u) {
-                unsub();
-                resolve(u);
-              }
-            }, (err) => {
-              try { unsub(); } catch (e) {}
-              reject(err);
-            });
-          });
-          const u = auth.currentUser;
-          if (u) await u.getIdToken(true);
-          await new Promise(r => setTimeout(r, 150));
-
-          const user = (data.user && typeof data.user === "object") ? data.user : {};
+          const user = {
+            name: (data.name != null) ? String(data.name).trim() : "",
+            staedte: Array.isArray(data.staedte)
+              ? data.staedte.map(s => String(s).trim()).filter(Boolean)
+              : (data.stadt ? [String(data.stadt).trim()].filter(Boolean) : [])
+          };
 
           window.pinUser = user;
 
@@ -839,7 +815,6 @@ const db = firebase.firestore();
     // Ausklapp-UI (Punkte 2-7)
     bindToggle("toggleWochenwartungBtn", "wochenwartungSection", "Wöchentliche Wartung anzeigen", "Wöchentliche Wartung verbergen", false);
     bindToggle("toggleWartungBtn", "wartungSection", "Reparaturen anzeigen", "Reparaturen verbergen", false);
-
 
     // ---------------- Bestellungen ----------------
     function setButtonState(id, on) {
@@ -1249,7 +1224,7 @@ const db = firebase.firestore();
     }
 
     requirePinOrStart(startApp);
-  
+
     // ---------------- i18n (Frontend-Sprachen) ----------------
     const translations = {
       de: {
@@ -1258,18 +1233,12 @@ const db = firebase.firestore();
         pin_required: "PIN erforderlich",
         pin_prompt: "Bitte PIN eingeben, um fortzufahren.",
         login: "Einloggen",
-
-        
-        
-        
-        
-        
         pin_error_prefix: "Fehler beim PIN-Check: ",
-pin_timeout: "PIN-Prüfung dauert zu lange. Bitte Internetverbindung prüfen und erneut versuchen.",
-pin_wrong: "PIN falsch.",
-pin_checking: "Prüfe…",
-pin_enter: "Bitte PIN eingeben.",
-sec1: "1. Automat auswählen",
+        pin_timeout: "PIN-Prüfung dauert zu lange. Bitte Internetverbindung prüfen und erneut versuchen.",
+        pin_wrong: "PIN falsch.",
+        pin_checking: "Prüfe…",
+        pin_enter: "Bitte PIN eingeben.",
+        sec1: "1. Automat auswählen",
         sec2: "2. Aufgaben pro Automat",
         sec3: "3. Funktionsprüfung",
         sec4: "4. Bestände pro Packung",
@@ -1336,9 +1305,9 @@ sec1: "1. Automat auswählen",
         chk_befeuchtung: "Befeuchtungstest",
         chk_reinigungstest: "Reinigungstest",
         chk_neuer_stab: "Neuen Stab genommen",
-        chk_roboterarm_90grad: "Roboterarm im 90°‑Winkel",
+        chk_roboterarm_90grad: "Roboterarm im 90°-Winkel",
         chk_kreditkarte_ok: "Kreditkartensystem OK",
-        chk_geldschein_ok: "Geldschein‑System OK",
+        chk_geldschein_ok: "Geldschein-System OK",
         chk_material_eingetragen: "Material im System eingetragen",
       },
       en: {
@@ -1347,18 +1316,12 @@ sec1: "1. Automat auswählen",
         pin_required: "PIN required",
         pin_prompt: "Please enter the PIN to continue.",
         login: "Log in",
-
-        
-        
-        
-        
-        
         pin_error_prefix: "PIN check error: ",
-pin_timeout: "PIN check is taking too long. Please check your internet connection and try again.",
-pin_wrong: "Wrong PIN.",
-pin_checking: "Checking…",
-pin_enter: "Please enter the PIN.",
-sec1: "1. Select machine",
+        pin_timeout: "PIN check is taking too long. Please check your internet connection and try again.",
+        pin_wrong: "Wrong PIN.",
+        pin_checking: "Checking…",
+        pin_enter: "Please enter the PIN.",
+        sec1: "1. Select machine",
         sec2: "2. Tasks per machine",
         sec3: "3. Function check",
         sec4: "4. Stock per pack",
@@ -1428,7 +1391,6 @@ sec1: "1. Select machine",
         chk_kreditkarte_ok: "Card payment system OK",
         chk_geldschein_ok: "Banknote system OK",
         chk_material_eingetragen: "Materials recorded in system",
-
       },
       tr: {
         title: "Temizlik kayıt formu – makineler",
@@ -1436,18 +1398,12 @@ sec1: "1. Select machine",
         pin_required: "PIN gerekli",
         pin_prompt: "Devam etmek için lütfen PIN girin.",
         login: "Giriş",
-
-        
-        
-        
-        
-        
         pin_error_prefix: "PIN kontrol hatası: ",
-pin_timeout: "PIN kontrolü çok uzun sürüyor. İnternet bağlantınızı kontrol edip tekrar deneyin.",
-pin_wrong: "PIN hatalı.",
-pin_checking: "Kontrol ediliyor…",
-pin_enter: "Lütfen PIN girin.",
-sec1: "1. Makine seç",
+        pin_timeout: "PIN kontrolü çok uzun sürüyor. İnternet bağlantınızı kontrol edip tekrar deneyin.",
+        pin_wrong: "PIN hatalı.",
+        pin_checking: "Kontrol ediliyor…",
+        pin_enter: "Lütfen PIN girin.",
+        sec1: "1. Makine seç",
         sec2: "2. Makine başına görevler",
         sec3: "3. Fonksiyon kontrolü",
         sec4: "4. Paket başına stok",
@@ -1517,7 +1473,6 @@ sec1: "1. Makine seç",
         chk_kreditkarte_ok: "Kredi kartı sistemi OK",
         chk_geldschein_ok: "Banknot sistemi OK",
         chk_material_eingetragen: "Malzemeler sisteme girildi",
-
       },
       ar: {
         title: "سجل تنظيف الأجهزة",
@@ -1574,7 +1529,6 @@ sec1: "1. Makine seç",
         lbl_repair_type_custom: "أو اسم مخصص",
         lbl_repair_details: "تفاصيل / ملاحظات",
 
-
         chk_zucker: "تم تعبئة السكر",
         chk_wasser: "تم تعبئة الماء",
         chk_staebeAuf: "تم تعبئة الأعواد",
@@ -1598,7 +1552,6 @@ sec1: "1. Makine seç",
         chk_kreditkarte_ok: "نظام الدفع بالبطاقة يعمل",
         chk_geldschein_ok: "نظام إدخال الأوراق النقدية يعمل",
         chk_material_eingetragen: "تم تسجيل المواد في النظام",
-
       }
     };
 
@@ -1607,7 +1560,6 @@ sec1: "1. Makine seç",
       const pack = translations[lang] || translations.de || {};
       return (pack[key] != null) ? pack[key] : fallback;
     }
-
 
     function applyTranslations(lang) {
       const t = translations[lang] || translations.de;
@@ -1648,8 +1600,6 @@ sec1: "1. Makine seç",
       updateToggle("toggleWochenwartungBtn", "toggle_weekly_show", "toggle_weekly_hide");
       updateToggle("toggleWartungBtn", "toggle_repairs_show", "toggle_repairs_hide");
 
-      // Buttons that still use textContent via data-i18n already handled above.
-      // Mark active button
       document.querySelectorAll(".lang-btn").forEach(b => {
         b.classList.toggle("active", b.dataset.lang === lang);
       });
